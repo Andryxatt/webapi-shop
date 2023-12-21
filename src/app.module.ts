@@ -24,7 +24,9 @@ import { FeaturesModule } from './features/features.module';
 import { ProductFeaturesModule } from './product-features/product-features.module';
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRootAsync({
       useFactory: () => ({
         type: 'postgres',
@@ -36,6 +38,9 @@ import { ProductFeaturesModule } from './product-features/product-features.modul
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true,
         autoLoadEntities: true,
+        ssl: {
+          rejectUnauthorized: false, // Disable SSL verification
+        },
       })
     }),
     BrandsModule,
@@ -66,5 +71,5 @@ export class AppModule {
   constructor(
     @InjectDataSource()
     private dataSource: DataSource
-  ) {}
+  ) { }
 }
