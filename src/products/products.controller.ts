@@ -5,13 +5,27 @@ import { UpdateProductDto } from "./dto/update-product.dto";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { multerOptions } from "src/utils/multer.options";
 import { Product } from "./entities/product.entity";
-
+import * as multerGoogleStorage from "multer-google-storage";
+import { v4 as uuid } from "uuid";
+import { extname } from "path";
 @Controller("products")
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  @UseInterceptors(FilesInterceptor("files", 20, multerOptions))
+  @UseInterceptors(
+    FilesInterceptor("files", 8, {
+      storage: multerGoogleStorage.storageEngine({
+        projectId: "shopfotos",
+        keyFilename: "src/shopfotos-c0c5c37a130a.json",
+        bucket: "my_bucket_shop_images",
+        filename: (req: any, file: any, cb: any) => {
+          // Calling the callback passing the random name generated with the original extension name
+          cb(null, `${uuid()}${extname(file.originalname)}`);
+        },
+      }),
+    }),
+  )
   create(@Body() createProductDto: CreateProductDto, @UploadedFiles() files: Array<Express.Multer.File>) {
     return this.productsService.create(createProductDto, files);
   }

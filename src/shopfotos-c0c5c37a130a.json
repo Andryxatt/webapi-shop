@@ -1,0 +1,14 @@
+{
+  "type": "service_account",
+  "project_id": "shopfotos",
+  "private_key_id": "c0c5c37a130a3d75b48c5b793a827ba151d53f3f",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDgFGA8SmLfeNyT\nW6sNfnkxjTwglV5NoSi8xo5sT/U5sK1yr9W1aG0hQ9TDT362BiUps6TBt6NvOOwk\nclAbg1mI/xQbOw2NXtsPie+ly/Wzyr+32fBaX6jSHo5xn/+t+H+PHxO3IW/T46xj\ner3llc3/Po6teek1E/2qfDzQWCTuhd9FHXMBBzAPOFEOkKlS6h4we3e818O9I0Rb\nSa02o/Gy/ayXdL+3jgs09Cph78qYOXyh9qlsnPWtZiBDVjX9yVw2n9XPbowu3jyD\nv2XcMK7p8Ss8ijF3ea8SrC+9t1wEteJydlfY8MoOnSrK20PWRKveOOhRHbAEZnI5\njwtTqrLxAgMBAAECggEACDBpHEhJ/j7uwro5fAat+66yGUJpiJ6V5vY+W2d9ql7S\nVpa7UZlQJFnUA1JFqsslMwsJak9MMK2iIFUxfRvrBavFdUGj0GbnIcApqwO98Oo9\nNkUc+KnhI9KxjntULwGzTwyfSL9MVLBP9cUVKQ2KknmGYdZ1fHbZ+6UgMitdKClY\npVhx3894nf530sfLW082jP36ATwADtedb1JQuz/IOKhxuIjJpiV19OlLjw4JP9b6\ng1VJqzA/s3VRrwABopWqWCqDHQhHZbGX+gMC8DB/emvcJfeGvOv+tgCZ34JYmrfQ\nue5o2SkOGvCFAR3ufmS7v+y7iABqdIz3XJYZc+JmMQKBgQDv6PjjZDNcIeZ2b7Or\nQ5+2OD5UxZQS8ZmBBhYabsYVwVp074XgPV+EusIZ4/ZhJPEyMv1E2UdvtAKh5VZc\nC5xb3R4AGPux5ZKscwdU9biS3KqxvKSHtEuIsGUCjyb79lyxonk2dm9tDdx8RLff\nxmgUtmnkzNNjbsSIrQFF6kpxSQKBgQDvG5wdpS5ZksvbUwrCrHVhVGp02C2PjXtA\nGhNr/f5tQuXB/HFulhyX15PpmgxekfX+4q5uIqro+QDk7zN4uUoXO3X+fBwIj9Kl\n4quegtvMUuSYdiSYzMQkDO6gS3rVpCX2eJhjNb+WPaMtquwzB3AfMfJlyC+iw76D\nef7X0wxcaQKBgBWIOV5fTeTE/iQ/HkcOyLTYE3AUU5fnqzlTTISO0KR/OBkqrj9U\nAtCs2mLsfN53LFavEOAvCCRUabASH1AfkqcED38+vshWrHVh1ZSggTJdL8zH+5Ra\ncDUSb95s7rjKgcNHq81hj9qf1dwpZr9k1U6WmKZ6Y7aW6HjD3ktiHdBRAoGBANL+\nMyG5zA/AyODuA3XLxvyvCA25YWLmfxcOq4rFJAl4WdR3FgV2sx6OXfhqNnYRKNjV\nYQTQ1K4mZFKgfXQPVUDw+GsrS3WGrGQzhCuo35oKn6ulvR+UuZPyUXPjhy4U3mcC\n/b22BSznkSHQTQOukZMFeRe1sctYHbpZIbeDhcnZAoGAMP0EBlnPTzxAYtVKBoTi\namK44fzy9S81FiAgieo6DgJsGCv6y5nlIQ9vyx7IuIBPVfuBOXNXIOw7DeE63ZmW\n81NC7F9LG2NcxOeXl2Uf8uh5pUY/9TNQ60WiwtGhuk7GmoNl183ScoawJubDiEE5\n/q3IuMv4iK2HfRkuCKhnUhs=\n-----END PRIVATE KEY-----\n",
+  "client_email": "andrii@shopfotos.iam.gserviceaccount.com",
+  "client_id": "114361373750630420541",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/andrii%40shopfotos.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
+
