@@ -10,6 +10,7 @@ async function bootstrap() {
   SwaggerModule.setup("api", app, document);
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
-  await app.listen(process.env.PORT || 3000);
+  const port: number = parseInt(`${process.env.PORT}`) || 3000;
+await app.listen(port);
 }
 bootstrap();
