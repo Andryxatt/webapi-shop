@@ -17,7 +17,6 @@ import { ProductFeature } from '@product-features/entities/product-feature.entit
 import { Feature } from '@features/entities/feature.entity';
 import { Colore } from '@colore/entities/colore.entity';
 import { Seasone } from '@seasone/entities/seasone.entity';
-import { CloudStorageService } from '@core/services/cloud-storage.service';
 
 @Injectable()
 export class ProductsService {
@@ -45,7 +44,6 @@ export class ProductsService {
     private readonly coloreRepository: Repository<Colore>,
     @InjectRepository(Seasone)
     private readonly seasoneRepository: Repository<Seasone>,
-    private cloudStorageService: CloudStorageService,
   ) { }
 
   async create(
