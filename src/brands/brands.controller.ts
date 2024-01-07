@@ -23,7 +23,7 @@ export class BrandsController {
           return cb(null, `${randomName}${extname(file.originalname)}`);
         },
       }),
-    }),
+    })
   )
   create(@Body() createBrandDto: CreateBrandDto, @UploadedFile() file) {
     return this.brandsService.create(createBrandDto, file);
@@ -55,7 +55,7 @@ export class BrandsController {
           return cb(null, `${randomName}${extname(file.originalname)}`);
         },
       }),
-    }),
+    })
   )
   update(@Param("id") id: number, @Body() updateBrandDto: UpdateBrandDto, @UploadedFile() file) {
     return this.brandsService.update(id, updateBrandDto, file);

@@ -17,10 +17,12 @@ import { ProductFeature } from '@product-features/entities/product-feature.entit
 import { Feature } from '@features/entities/feature.entity';
 import { Colore } from '@colore/entities/colore.entity';
 import { Seasone } from '@seasone/entities/seasone.entity';
+import { CloudStorageService } from '@core/services/cloud-storage.service';
 
 @Injectable()
 export class ProductsService {
   constructor(
+    
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
     @InjectRepository(Brand)
@@ -43,6 +45,7 @@ export class ProductsService {
     private readonly coloreRepository: Repository<Colore>,
     @InjectRepository(Seasone)
     private readonly seasoneRepository: Repository<Seasone>,
+    private cloudStorageService: CloudStorageService,
   ) { }
 
   async create(
@@ -55,14 +58,12 @@ export class ProductsService {
     const seasone = await this.seasoneRepository.findOneBy({
       id: createProductDto.seasoneId,
     });
-    console.log(seasone, 'seasone');
     const gender = await this.brandRepository.findOneBy({
       id: createProductDto.genderId,
     });
     const discount = await this.discountRepository.findOneBy({ id: createProductDto.discountId });
 
     const subCategoriesIds = JSON.parse("" + createProductDto.subCategories + "");
-    console.log(subCategoriesIds, 'subCategoriesIds');
     const subCategories = await this.subCategoryRepository.findBy({
       id: In(subCategoriesIds),
     });
@@ -96,7 +97,9 @@ export class ProductsService {
       });
     }
     if (files !== null || files !== undefined) {
+      console.log(files, 'filesUploaded');
       files.forEach(async (image) => {
+        console.log(image, 'image sss')
         const productImage = new ProductImage();
         productImage.imagePath = image.path;
         productImage.product = product;
@@ -119,7 +122,7 @@ export class ProductsService {
 
   async findAll(page: number, limit: number, search: string): Promise<PaginationProducts> {
     const total = await this.productRepository.count();
-    console.log(total, 'total');
+   
     const products = await this.productRepository.find({
       relations: ['brand', 'subCategories', 'sizes', 'images', 'discount', 'colores', 'gender', 'seasone', 'features'],
       skip: (page - 1) * limit,
@@ -136,12 +139,10 @@ export class ProductsService {
 
   findOne(id: number): Promise<Product> {
     const product = this.productRepository.findOne({ relations: ['brand', 'subCategories', 'sizes', 'images'], where: { id: id } });
-    console.log(product, 'product');
     return product
   }
 
   async update(id: number, updateProductDto: UpdateProductDto, files: Array<Express.Multer.File>) {
-    console.log(files, 'files')
     const product = await this.productRepository.findOne({
       where: { id: id },
       relations: ['images', 'sizes', 'subCategories', 'brand']
@@ -168,17 +169,14 @@ export class ProductsService {
         const productImage = new ProductImage();
         productImage.imagePath = image.path;
         productImage.product = updatedProduct;
-        console.log(productImage, 'productImage');
         await this.productImageRepository.save(productImage);
       });
     };
     // //TODO update product sizes
     if (updateProductDto.sizes !== null || updateProductDto.sizes !== undefined) {
       const sizes = JSON.parse("" + updateProductDto.sizes + "");
-      console.log(sizes, 'sizes');
       sizes.forEach(async (element) => {
         const sizeProduct = await this.productToSizeRepository.findOneBy({ size: { id: element.sizeId }, product: { id: updatedProduct.id } });
-        console.log(element, 'element');
         if (sizeProduct !== null && sizeProduct !== undefined) {
           sizeProduct.quantity = Number(element.quantity);
           await this.productToSizeRepository.save(sizeProduct);

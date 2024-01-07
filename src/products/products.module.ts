@@ -16,6 +16,7 @@ import { Discount } from "src/discount/entities/discount.entity";
 import { Feature } from "src/features/entities/feature.entity";
 import { ProductFeature } from "@product-features/entities/product-feature.entity";
 import { ProductImagesService } from "@product-images/product-images.service";
+import { CloudStorageService } from "@core/services/cloud-storage.service";
 
 @Module({
   imports: [
@@ -34,6 +35,6 @@ import { ProductImagesService } from "@product-images/product-images.service";
     JwtModule,
   ],
   controllers: [ProductsController],
-  providers: [ProductsService],
+  providers: [ProductsService, CloudStorageService],
 })
 export class ProductsModule {}

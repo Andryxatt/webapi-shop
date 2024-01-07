@@ -38,9 +38,6 @@ import { ProductFeaturesModule } from './product-features/product-features.modul
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true,
         autoLoadEntities: true,
-        ssl: {
-          rejectUnauthorized: false, // Disable SSL verification
-        },
       })
     }),
     BrandsModule,
