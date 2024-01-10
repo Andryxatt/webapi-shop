@@ -31,7 +31,7 @@ import { ProductFeaturesModule } from './product-features/product-features.modul
       useFactory: () => ({
         type: 'postgres',
         host: process.env.DB_HOST,
-        port: parseInt(process.env.DB_PORT) || 3306,
+        port: parseInt(process.env.DB_PORT) || 5432,
         username: process.env.DB_USERNAME,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_DATABASE,
