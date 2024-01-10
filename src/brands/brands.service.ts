@@ -16,7 +16,12 @@ export class BrandsService {
   create(createBrandDto: CreateBrandDto, file: any) {
     const brand = new Brand();
     brand.name = createBrandDto.name;
-    brand.iconPath = file.path;
+    if(file !== undefined && file !== null){
+      brand.iconPath = file.path;
+    }
+    else {
+      brand.iconPath = "default.png"
+    }
     brand.description = createBrandDto.description;
     return this.brandRepository.save(brand);
   }
