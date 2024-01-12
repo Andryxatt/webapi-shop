@@ -38,6 +38,10 @@ export class BrandsController {
   findOne(@Param("id") id: number) {
     return this.brandsService.findOne(id);
   }
+  // @Get("uploads/files/brands")
+  // async getFiles(@Res() res) {
+  //   res.sendFile(null, { root: "uploads/files/brands" });
+  // }
   @Get("uploads/files/brands/:fileId")
   async getBrand(@Param("fileId") fileId, @Res() res): Promise<any> {
     res.sendFile(fileId, { root: "uploads/files/brands" });
