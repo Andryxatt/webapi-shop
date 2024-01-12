@@ -26,6 +26,9 @@ jobs:
 
     - name: Deploy to VPS
       run: |
-        ssh -o StrictHostKeyChecking=no andron@62.72.22.121 'cd /var/www/html/webapi-shop && git pull && npm install && npm run build && pm2 restart webapi-shop'
+        eval $(ssh-agent -s)
+        ssh-add <(echo "$SSH_PRIVATE_KEY")
+        ssh -o StrictHostKeyChecking=no andron@your.vps.ip.address 'cd /var/www/html/webapi-shop && git pull && npm install && npm run build && pm2 restart webapi-shop'
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+    
