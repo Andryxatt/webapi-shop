@@ -13,10 +13,11 @@ async function bootstrap() {
     optionsSuccessStatus: 204,
   };
   const app = await NestFactory.create(AppModule);
+  app.enableCors(corsOptions);
   const config = new DocumentBuilder().setTitle("Web Api").setDescription("The webapi API description").setVersion("1.0").addBearerAuth().addTag("api").build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, document);
-  app.enableCors(corsOptions);
+
   app.use("/uploads/files/", express.static(join(__dirname, "..", "uploads/files/")));
   app.useGlobalPipes(new ValidationPipe());
   app.listen(parseInt(process.env.PORT) || 3000);
