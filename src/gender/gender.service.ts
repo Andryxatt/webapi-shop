@@ -9,9 +9,10 @@ import { Repository } from "typeorm";
 export class GenderService {
   constructor(
     @InjectRepository(Gender)
-    private readonly genderRepository: Repository<Gender>,
+    private readonly genderRepository: Repository<Gender>
   ) {}
   create(createGenderDto: CreateGenderDto) {
+    console.log(createGenderDto);
     return this.genderRepository.save(createGenderDto);
   }
 
