@@ -1,0 +1,42 @@
+name: Node.js CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [19]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Lint code
+      run: npm run lint
+
+    - name: Build application
+      run: npm run build
+
+    - name: Run tests
+      run: npm test
+
+    - name: Deploy to server (replace with your deployment script)
+      run: |
+        ssh andron@62.72.22.121 'cd /var/www/html/webapi-shop && git pull && npm install && npm run build && pm2 restart webapi-shop'
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
