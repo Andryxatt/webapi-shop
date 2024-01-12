@@ -7,7 +7,7 @@ import { join } from "path";
 import { CorsOptions } from "@nestjs/common/interfaces/external/cors-options.interface";
 async function bootstrap() {
   const corsOptions: CorsOptions = {
-    origin: ["https://step-in-style.shop", "http://localhost:5173"], // Replace with your React app's domain
+    origin: ["https://step-in-style.shop", "http://loclhost/5173"], // Replace with your React app's domain
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
     optionsSuccessStatus: 204,
