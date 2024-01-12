@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Deploy to VPS
 
 on:
   push:
@@ -6,13 +6,8 @@ on:
       - main
 
 jobs:
-  build:
-
+  deploy:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [19]
 
     steps:
     - name: Checkout repository
@@ -21,20 +16,16 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: 14
 
-    - name: Install dependencies
+    - name: Install Dependencies
       run: npm install
 
-    - name: Lint code
-      run: npm run lint
-
-    - name: Build application
+    - name: Build Application
       run: npm run build
 
-    - name: Deploy to server (replace with your deployment script)
+    - name: Deploy to VPS
       run: |
         ssh -o StrictHostKeyChecking=no andron@62.72.22.121 'cd /var/www/html/webapi-shop && git pull && npm install && npm run build && pm2 restart webapi-shop'
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-    
