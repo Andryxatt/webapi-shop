@@ -7,7 +7,9 @@ import { join } from "path";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     cors: {
-      origin: "*",
+      origin: "http://localhost:5173",
+      allowedHeaders: "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept",
+      methods: "GET,PUT,POST,DELETE,UPDATE,OPTIONS",
       credentials: true, // Enable CORS credentials if needed
     },
   });
