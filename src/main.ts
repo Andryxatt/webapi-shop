@@ -5,8 +5,7 @@ import { ValidationPipe } from "@nestjs/common";
 import * as express from "express";
 import { join } from "path";
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.use(cors());
+  const app = await NestFactory.create(AppModule, { cors: true });
   const config = new DocumentBuilder().setTitle("Web Api").setDescription("The webapi API description").setVersion("1.0").addBearerAuth().addTag("api").build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, document);
@@ -16,6 +15,3 @@ async function bootstrap() {
   app.listen(parseInt(process.env.PORT) || 3000);
 }
 bootstrap();
-function cors(): any {
-  throw new Error("Function not implemented.");
-}
