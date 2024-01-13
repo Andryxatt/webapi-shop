@@ -5,13 +5,10 @@ import { ValidationPipe } from "@nestjs/common";
 import * as express from "express";
 import { join } from "path";
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    cors: {
-      origin: "http://localhost:5173",
-      allowedHeaders: "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept",
-      methods: "GET,PUT,POST,DELETE,UPDATE,OPTIONS",
-      credentials: true, // Enable CORS credentials if needed
-    },
+  const app = await NestFactory.create(AppModule);
+  app.enableCors({
+    origin: "http://localhost:3000",
+    credentials: true,
   });
   const config = new DocumentBuilder().setTitle("Web Api").setDescription("The webapi API description").setVersion("1.0").addBearerAuth().addTag("api").build();
   const document = SwaggerModule.createDocument(app, config);
