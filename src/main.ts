@@ -5,7 +5,12 @@ import { ValidationPipe } from "@nestjs/common";
 import * as express from "express";
 import { join } from "path";
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create(AppModule, {
+    cors: {
+      origin: ["https://step-in-style.shop/", "http://localhost:5173/"],
+      credentials: true, // Enable CORS credentials if needed
+    },
+  });
   const config = new DocumentBuilder().setTitle("Web Api").setDescription("The webapi API description").setVersion("1.0").addBearerAuth().addTag("api").build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, document);
