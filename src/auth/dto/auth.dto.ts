@@ -18,9 +18,6 @@ export class RegisterDto {
   @ApiProperty()
   public readonly username: string;
   
-  @IsString()
-  @ApiProperty()
-  mobilePhoneNumber: string;
 }
 
 export class LoginDto {
