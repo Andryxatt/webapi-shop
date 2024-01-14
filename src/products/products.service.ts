@@ -120,19 +120,30 @@ export class ProductsService {
 
   async findAll(page: number, limit: number, search: string): Promise<PaginationProducts> {
     const total = await this.productRepository.count();
+    if(search === undefined || search === null || search === ''){
+      const products = await this.productRepository.find({
+        relations: ['brand', 'subCategories', 'sizes', 'images', 'discount', 'colores', 'gender', 'seasone', 'features'],
+        skip: (page - 1) * limit,
+        take: limit,
+      });
+      return { products, total };
+    }
+    else {
+      const products = await this.productRepository.find({
+        relations: ['brand', 'subCategories', 'sizes', 'images', 'discount', 'colores', 'gender', 'seasone', 'features'],
+        skip: (page - 1) * limit,
+        take: limit,
+        where: [
+          { name: ILike(`%${search}%`) },
+          { model: ILike(`%${search}%`) },
+          { description: ILike(`%${search}%`) },
+          { brand: { name: ILike(`%${search}%`) } },
+        ],
+      });
+      return { products, total };
+    }
+
    
-    const products = await this.productRepository.find({
-      relations: ['brand', 'subCategories', 'sizes', 'images', 'discount', 'colores', 'gender', 'seasone', 'features'],
-      skip: (page - 1) * limit,
-      take: limit,
-      where: [
-        { name: ILike(`%${search}%`) },
-        { model: ILike(`%${search}%`) },
-        { description: ILike(`%${search}%`) },
-        { brand: { name: ILike(`%${search}%`) } },
-      ],
-    });
-    return { products, total };
   }
 
   findOne(id: number): Promise<Product> {

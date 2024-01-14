@@ -37,7 +37,7 @@ export class ProductsController {
   }
   @Get()
   findAll(@Query("page") page = 1, @Query("limit") limit: number, @Query("search") search?: string) {
-    console.log(typeof page, typeof limit, typeof search);
+    console.log(typeof page, typeof limit, search);
     return this.productsService.findAll(Number(page), Number(limit), search);
   }
   @Get("newProducts")
