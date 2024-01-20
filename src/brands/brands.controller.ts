@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, Res } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, Res, BadRequestException } from "@nestjs/common";
 import { BrandsService } from "./brands.service";
 import { CreateBrandDto } from "./dto/create-brand.dto";
 import { UpdateBrandDto } from "./dto/update-brand.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { extname } from "path";
+import { validate } from "class-validator";
+import { unlinkSync } from "fs";
+import { Brand } from "./entities/brand.entity";
 
 @Controller("brands")
 export class BrandsController {
@@ -25,7 +28,32 @@ export class BrandsController {
       }),
     })
   )
-  create(@Body() createBrandDto: CreateBrandDto, @UploadedFile() file) {
+  @Post()
+  @UseInterceptors(
+    FileInterceptor("file", {
+      storage: diskStorage({
+        destination: "./uploads/files/brands",
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join("");
+          return cb(null, `${randomName}${extname(file.originalname)}`);
+        },
+      }),
+    })
+  )
+  async create(@Body() createBrandDto: CreateBrandDto, @UploadedFile() file: Express.Multer.File) {
+    // Validate the brand DTO
+    const errors = await validate(createBrandDto);
+    if (errors.length > 0) {
+      // If validation fails, delete the uploaded file (if any) and throw a BadRequestException
+      if (file) {
+        unlinkSync(file.path);
+      }
+      throw new BadRequestException("Validation failed");
+    }
+    // Save the brand to the database
     return this.brandsService.create(createBrandDto, file);
   }
 
