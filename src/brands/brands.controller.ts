@@ -13,7 +13,6 @@ import { Brand } from "./entities/brand.entity";
 export class BrandsController {
   constructor(private readonly brandsService: BrandsService) {}
 
-
   @Post()
   @UseInterceptors(
     FileInterceptor("file", {
