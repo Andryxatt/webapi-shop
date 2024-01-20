@@ -13,21 +13,7 @@ import { Brand } from "./entities/brand.entity";
 export class BrandsController {
   constructor(private readonly brandsService: BrandsService) {}
 
-  @Post()
-  @UseInterceptors(
-    FileInterceptor("file", {
-      storage: diskStorage({
-        destination: "./uploads/files/brands",
-        filename: (req, file, cb) => {
-          const randomName = Array(32)
-            .fill(null)
-            .map(() => Math.round(Math.random() * 16).toString(16))
-            .join("");
-          return cb(null, `${randomName}${extname(file.originalname)}`);
-        },
-      }),
-    })
-  )
+
   @Post()
   @UseInterceptors(
     FileInterceptor("file", {
