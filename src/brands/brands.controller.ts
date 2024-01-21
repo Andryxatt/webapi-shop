@@ -16,7 +16,11 @@ export class BrandsController {
   @Post()
   async create(@Body() createBrandDto: CreateBrandDto, @UploadedFile() file: Express.Multer.File) {
     // Validate the brand DTO
-    const errors = await validate(createBrandDto);
+    const brand = new Brand();
+    brand.name = createBrandDto.name;
+    brand.description = createBrandDto.description;
+    brand.iconPath = "default.png";
+    const errors = await validate(brand);
     if (errors.length > 0) {
       // If validation fails, delete the uploaded file (if any) and throw a BadRequestException
       if (file) {
