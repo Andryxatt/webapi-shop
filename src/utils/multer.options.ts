@@ -4,7 +4,6 @@ import { existsSync, mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
 import { v4 as uuid } from 'uuid';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import * as multerGoogleStorage from "multer-google-storage";
 export const multerOptions = {
   limits: {
     fileSize: 5 * 1024 * 1024,

@@ -118,7 +118,7 @@ export class ProductsService {
     return product;
   }
 
-  async findAll(page: number, limit: number, search: string): Promise<PaginationProducts> {
+  async findAll(page: number, limit: number, search?: string): Promise<PaginationProducts> {
     const total = await this.productRepository.count();
     if(search === undefined || search === null || search === ''){
       const products = await this.productRepository.find({

@@ -13,30 +13,38 @@ export class BrandsService {
     @InjectRepository(Brand)
     private readonly brandRepository: Repository<Brand>,
   ) { }
-  create(createBrandDto: CreateBrandDto, file: any) {
+  async create(createBrandDto: CreateBrandDto, file: any): Promise<Brand> {
     const brand = new Brand();
     brand.name = createBrandDto.name;
-    brand.description = createBrandDto.description;
-    const uploadPath = "./uploads/files/brands";
-    const uniqueFilename = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    try {
-      // Save the file using the built-in fs module
-      fs.writeFileSync(uploadPath + uniqueFilename, file.buffer);
-      brand.iconPath = uniqueFilename;
-    } catch (error) {
-      throw new Error('Error saving the file: ' + error.message);
+
+    if (file) {
+      brand.iconPath = file.path;
+    } else {
+      brand.iconPath = 'default.png';
     }
-    return this.brandRepository.save(brand);
-    // const brand = new Brand();
-    // brand.name = createBrandDto.name;
-    // if(file !== undefined && file !== null){
-    //   brand.iconPath = file.path;
-    // }
-    // else {
-    //   brand.iconPath = "default.png"
-    // }
-    // brand.description = createBrandDto.description;
-    // return this.brandRepository.save(brand);
+
+    brand.description = createBrandDto.description;
+    console.log(brand, 'brand');
+
+    try {
+      const newBrand = await this.brandRepository.save(brand);
+      return newBrand;
+    } catch (error) {
+      console.error(error, 'Error caught during brand save');
+
+      // Remove the file if it was created and log any error during removal
+      if (file) {
+        try {
+          await removeFile(brand.iconPath);
+          console.log('File removed successfully');
+        } catch (removeError) {
+          console.error(removeError, 'Error caught during file removal');
+        }
+      }
+
+      // Rethrow the error to allow higher-level error handling
+      throw error;
+    }
   }
 
   findAll(): Promise<Brand[]> {
