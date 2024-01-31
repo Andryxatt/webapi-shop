@@ -13,10 +13,10 @@ export class CreateProductDto {
   model: string;
   @ApiProperty()
   @IsString()
-  description: string;
+  description?: string;
   @ApiProperty()
   @IsString()
-  status: string;
+  status?: string;
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
@@ -25,29 +25,29 @@ export class CreateProductDto {
   @IsString()
   curencyPrice: string;
   @ApiProperty()
-  brandId: number;
+  brandId?: number;
   @ApiProperty()
-  genderId: number;
+  genderId?: number;
   @ApiProperty()
-  seasoneId: number;
+  seasoneId?: number;
   @ApiProperty()
-  discountId: number;
+  discountId?: number;
   @ApiProperty({
     isArray: true,
   })
-  subCategories: object[];
+  subCategories?: object[];
   @ApiProperty({
     isArray: true,
   })
-  features: CreateProductFeatureDto[];
+  features?: CreateProductFeatureDto[];
   @ApiProperty({
     isArray: true,
   })
-  colores: object[];
+  colores?: object[];
   @ApiProperty({
     isArray: true,
   })
-  images: any[];
+  images?: any[];
   @ApiProperty({
     isArray: true,
   })

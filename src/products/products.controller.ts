@@ -14,20 +14,7 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  @UseInterceptors(
-    FilesInterceptor("files", 20, multerOptions)
-    // FilesInterceptor("files", 8, {
-    //   storage: multerGoogleStorage.storageEngine({
-    //     projectId: "shopfotos",
-    //     bucket: "shop_bucket_api",
-    //     keyFilename: "src/shop-info-config.json",
-    //     filename: (req: any, file: any, cb: any) => {
-    //       // Calling the callback passing the random name generated with the original extension name
-    //       cb(null, `${uuid()}${extname(file.originalname)}`);
-    //     },
-    //   }),
-    // })
-  )
+  @UseInterceptors(FilesInterceptor("files", 20, multerOptions))
   create(@Body() createProductDto: CreateProductDto, @UploadedFiles() files: Array<Express.Multer.File>) {
     return this.productsService.create(createProductDto, files);
   }
@@ -36,13 +23,11 @@ export class ProductsController {
     res.sendFile(fileId, { root: "uploads/files/products" });
   }
   @Get()
-  findAll(@Query("page") page = 1, @Query("limit") limit: number, @Query("search") search?: string) {
-    console.log(page, limit, search);
-    return this.productsService.findAll(Number(page), Number(limit), search);
+  findAll(@Query("page") page = 1, @Query("limit") limit: number, @Query("search") search?: string, @Query("filters") filters?: any[]) {
+    return this.productsService.findAll(Number(page), Number(limit), search, filters);
   }
   @Get("newProducts")
   topNewProducts() {
-    console.log("newProducts");
     return this.productsService.topNew();
   }
 
@@ -54,8 +39,6 @@ export class ProductsController {
   @Patch(":id")
   @UseInterceptors(FilesInterceptor("files", 20, multerOptions))
   update(@Param("id") id: string, @Body() updateProductDto: UpdateProductDto, @UploadedFiles() files: Array<Express.Multer.File>) {
-    console.log(updateProductDto);
-    console.log(Number(id));
     return this.productsService.update(Number(id), updateProductDto, files);
   }
 

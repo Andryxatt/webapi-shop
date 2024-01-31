@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Exclude } from 'class-transformer';
-import { Order } from 'src/order/entities/order.entity';
-import { Role } from 'src/utils/role.enum';
+import { Order } from '../order/entities/order.entity';
+import { Role } from '../utils/role.enum';
 import {
   Column,
   Entity,

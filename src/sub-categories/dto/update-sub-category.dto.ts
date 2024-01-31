@@ -1,4 +1,15 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateSubCategoryDto } from './create-sub-category.dto';
+import { ApiProperty } from "@nestjs/swagger";
+import { IsString } from "class-validator";
 
-export class UpdateSubCategoryDto extends PartialType(CreateSubCategoryDto) {}
+export class UpdateSubCategoryDto {
+  @ApiProperty()
+  id: number;
+  @IsString()
+  @ApiProperty()
+  name: string;
+  @ApiProperty()
+  @IsString()
+  description: string;
+  @ApiProperty()
+  categoryId: number;
+}

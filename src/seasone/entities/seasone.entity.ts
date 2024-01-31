@@ -1,4 +1,4 @@
-import { Product } from "src/products/entities/product.entity";
+import { Product } from "../../products/entities/product.entity";
 import { PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Column, OneToMany, Entity } from "typeorm";
 @Entity("Seasones")
 export class Seasone {

@@ -5,14 +5,16 @@ import { UpdateBrandDto } from './dto/update-brand.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Brand } from './entities/brand.entity';
-import { removeFile } from 'src/utils/remove-file';
-import * as fs from 'fs';
+import { removeFile } from '../utils/remove-file';
 @Injectable()
 export class BrandsService {
   constructor(
     @InjectRepository(Brand)
     private readonly brandRepository: Repository<Brand>,
-  ) { }
+  ) {
+    
+   }
+   
   async create(createBrandDto: CreateBrandDto, file: any): Promise<Brand> {
     const brand = new Brand();
     brand.name = createBrandDto.name;

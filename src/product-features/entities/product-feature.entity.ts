@@ -1,5 +1,5 @@
-import { Product } from "@products/entities/product.entity";
-import { Feature } from "src/features/entities/feature.entity";
+import { Product } from "../../products/entities/product.entity";
+import { Feature } from "../../features/entities/feature.entity";
 import { PrimaryGeneratedColumn, Column, ManyToOne, Entity } from "typeorm";
 @Entity("ProductFeatures")
 export class ProductFeature {

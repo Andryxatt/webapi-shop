@@ -21,7 +21,7 @@ import { Seasone } from '@seasone/entities/seasone.entity';
 @Injectable()
 export class ProductsService {
   constructor(
-    
+
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
     @InjectRepository(Brand)
@@ -84,7 +84,7 @@ export class ProductsService {
       colores: coloresAdded,
     });
 
-    if(createProductDto.features !== null || createProductDto.features !== undefined){
+    if (createProductDto.features !== null || createProductDto.features !== undefined) {
       const features = JSON.parse("" + createProductDto.features + "");
       features.forEach(async (element) => {
         const productFeature = new ProductFeature();
@@ -95,9 +95,7 @@ export class ProductsService {
       });
     }
     if (files !== null || files !== undefined) {
-      console.log(files, 'filesUploaded');
       files.forEach(async (image) => {
-        console.log(image, 'image sss')
         const productImage = new ProductImage();
         productImage.imagePath = image.path;
         productImage.product = product;
@@ -114,36 +112,64 @@ export class ProductsService {
         await this.productToSizeRepository.save(sizeToProduct);
       });
     }
-    console.log(product, 'product');
     return product;
   }
-
-  async findAll(page: number, limit: number, search?: string): Promise<PaginationProducts> {
+  transformFiltersToQueryObject(filters: any[]): Record<string, any>[] {
+    const queryObjects: Record<string, any>[] = [];
+  
+    filters.forEach((filter) => {
+      if (filter.elements && filter.elements.length > 0) {
+        const elementIds = filter.elements.map((element: any) => element.id);
+        const queryObject: Record<string, any> = {};
+        if(filter.name === 'subCategories'){
+          queryObject[filter.name] = {
+            category: {
+              id: In(elementIds)
+            }
+          }
+        }
+        else{
+          queryObject[filter.name] = In(elementIds);
+       
+        }
+        queryObjects.push(queryObject);
+      }
+    });
+  
+    return queryObjects;
+  }
+  async findAll(page: number, limit: number, search?: string, filters?: any): Promise<PaginationProducts> {
+    const whereCondition: any[] = []
+    let filtersQuery: Record<string, any>[] = [];
+    // Check if filters is not null or undefined before processing
+    if (filters !== undefined && filters !== null && filters !== '' && filters !== '[]') {
+      // Filters are not empty
+      filtersQuery = this.transformFiltersToQueryObject(JSON.parse(filters));
+      console.log(filtersQuery, "filtersQuery")
+      if (search !== undefined && search !== null && search.trim() !== '') {
+        // Both filters and search are not empty
+        whereCondition.push({ name: ILike(`%${search}%`), ...Object.assign({}, ...filtersQuery)});
+      } else {
+        // Filters are not empty, but search is empty
+        // whereCondition.push({...Object.assign({}, ...filtersQuery)});
+        whereCondition.push({...Object.assign({}, ...filtersQuery)});
+      }
+    } else if (search !== undefined && search !== null && search.trim() !== '') {
+      // Filters are empty, but search is not empty
+      whereCondition.push({ name: ILike(`%${search}%`) });
+    }
+  
+    const query: any = {
+      relations: ['brand', 'subCategories', 'sizes', 'images', 'discount', 'colores', 'gender', 'seasone', 'features'],
+      skip: (page - 1) * limit,
+      take: limit,
+      where: whereCondition.length > 0 ? whereCondition : undefined,
+    };
+    console.log(query)
+    const products = await this.productRepository.find(query);
+  //get total
     const total = await this.productRepository.count();
-    if(search === undefined || search === null || search === ''){
-      const products = await this.productRepository.find({
-        relations: ['brand', 'subCategories', 'sizes', 'images', 'discount', 'colores', 'gender', 'seasone', 'features'],
-        skip: (page - 1) * limit,
-        take: limit,
-      });
-      return { products, total };
-    }
-    else {
-      const products = await this.productRepository.find({
-        relations: ['brand', 'subCategories', 'sizes', 'images', 'discount', 'colores', 'gender', 'seasone', 'features'],
-        skip: (page - 1) * limit,
-        take: limit,
-        where: [
-          { name: ILike(`%${search}%`) },
-          { model: ILike(`%${search}%`) },
-          { description: ILike(`%${search}%`) },
-          { brand: { name: ILike(`%${search}%`) } },
-        ],
-      });
-      return { products, total };
-    }
-
-   
+    return { products, total }
   }
 
   findOne(id: number): Promise<Product> {
@@ -173,14 +199,12 @@ export class ProductsService {
     const updatedProduct = await this.productRepository.save(product);
 
 
-    if (files !== null || files !== undefined) {
-      files.forEach(async (image) => {
-        const productImage = new ProductImage();
-        productImage.imagePath = image.path;
-        productImage.product = updatedProduct;
-        await this.productImageRepository.save(productImage);
-      });
-    };
+    files?.forEach(async (image) => {
+      const productImage = new ProductImage();
+      productImage.imagePath = image.path;
+      productImage.product = updatedProduct;
+      await this.productImageRepository.save(productImage);
+    });
     // //TODO update product sizes
     if (updateProductDto.sizes !== null || updateProductDto.sizes !== undefined) {
       const sizes = JSON.parse("" + updateProductDto.sizes + "");

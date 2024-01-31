@@ -1,18 +1,8 @@
-import { Category } from 'src/categories/entities/category.entity';
-import { Product } from 'src/products/entities/product.entity';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  JoinTable,
-  ManyToMany,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Category } from "../../categories/entities/category.entity";
+import { Product } from "../../products/entities/product.entity";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
-@Entity('SubCategories')
+@Entity("SubCategories")
 export class SubCategory {
   @PrimaryGeneratedColumn()
   id: number;
@@ -24,12 +14,11 @@ export class SubCategory {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
-  @ManyToOne(() => Category, (category) => category.subCategories, {
-    //load category when subcategory is loaded
+  @ManyToOne(() => Category, category => category.subCategories, {
     eager: true,
   })
-  @JoinColumn({ name: 'CategoryId' })
+  @JoinColumn({ name: "CategoryId" })
   category: Category;
-  @ManyToMany(() => Product, (product) => product.subCategories)
+  @ManyToMany(() => Product, product => product.subCategories)
   products: Product;
 }

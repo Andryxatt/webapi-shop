@@ -1,15 +1,7 @@
-import { SubCategory } from 'src/sub-categories/entities/sub-category.entity';
-import {
-  Column,
-  Entity,
-  CreateDateColumn,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-  OneToMany,
-  DeleteDateColumn,
-} from 'typeorm';
+import { SubCategory } from "../../sub-categories/entities/sub-category.entity";
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 
-@Entity('Categories')
+@Entity("Categories")
 export class Category {
   @PrimaryGeneratedColumn()
   id: number;
@@ -17,8 +9,8 @@ export class Category {
   name: string;
   @Column()
   description: string;
-  @OneToMany(() => SubCategory, (subCategory) => subCategory.category, {
-    onDelete: 'CASCADE',
+  @OneToMany(() => SubCategory, subCategory => subCategory.category, {
+    onDelete: "CASCADE",
   })
   subCategories: SubCategory[];
 }

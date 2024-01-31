@@ -1,13 +1,13 @@
-import { ProductFeature } from "@product-features/entities/product-feature.entity";
-import { Brand } from "src/brands/entities/brand.entity";
-import { Colore } from "src/colore/entities/colore.entity";
-import { Discount } from "src/discount/entities/discount.entity";
-import { Gender } from "src/gender/entities/gender.entity";
-import { OrderItem } from "src/order-item/entities/order-item.entity";
-import { ProductImage } from "src/product-images/entities/product-image.entity";
-import { ProductToSize } from "src/product-to-size/entities/product-to-size.entity";
-import { Seasone } from "src/seasone/entities/seasone.entity";
-import { SubCategory } from "src/sub-categories/entities/sub-category.entity";
+import { ProductFeature } from "../../product-features/entities/product-feature.entity";
+import { Brand } from "../../brands/entities/brand.entity";
+import { Colore } from "../../colore/entities/colore.entity";
+import { Discount } from "../../discount/entities/discount.entity";
+import { Gender } from "../../gender/entities/gender.entity";
+import { OrderItem } from "../../order-item/entities/order-item.entity";
+import { ProductImage } from "../../product-images/entities/product-image.entity";
+import { ProductToSize } from "../../product-to-size/entities/product-to-size.entity";
+import { Seasone } from "../../seasone/entities/seasone.entity";
+import { SubCategory } from "../../sub-categories/entities/sub-category.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 @Entity("Products")
 export class Product {
