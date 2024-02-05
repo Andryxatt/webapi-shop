@@ -12,7 +12,6 @@ export class GenderService {
     private readonly genderRepository: Repository<Gender>
   ) {}
   create(createGenderDto: CreateGenderDto) {
-    console.log(createGenderDto);
     return this.genderRepository.save(createGenderDto);
   }
 

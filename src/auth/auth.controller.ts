@@ -16,14 +16,12 @@ export class AuthController {
   }
   @Post("login")
   private login(@Body() body: LoginDto): Promise<{ token: string; user: User }> {
-    console.log(body, "body");
     return this.service.login(body);
   }
 
   @Post("refresh")
   @UseGuards(AuthGuard)
   private refresh(@Req() { user }: any): Promise<string | never | any> {
-    console.log(user, "user");
     if (!user) {
       throw new HttpException("No user found", HttpStatus.NOT_FOUND);
     }

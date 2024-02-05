@@ -27,7 +27,6 @@ export class BrandsController {
     })
   )
   async create(@Body() createBrandDto: CreateBrandDto, @UploadedFile() file: Express.Multer.File) {
-    console.log("response", file, createBrandDto);
     // Validate the brand DTO
     const brand = new Brand();
     brand.name = createBrandDto.name;

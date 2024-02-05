@@ -116,26 +116,26 @@ export class ProductsService {
   }
   transformFiltersToQueryObject(filters: any[]): Record<string, any>[] {
     const queryObjects: Record<string, any>[] = [];
-  
+
     filters.forEach((filter) => {
       if (filter.elements && filter.elements.length > 0) {
         const elementIds = filter.elements.map((element: any) => element.id);
         const queryObject: Record<string, any> = {};
-        if(filter.name === 'subCategories'){
+        if (filter.name === 'subCategories') {
           queryObject[filter.name] = {
             category: {
               id: In(elementIds)
             }
           }
         }
-        else{
+        else {
           queryObject[filter.name] = In(elementIds);
-       
+
         }
         queryObjects.push(queryObject);
       }
     });
-  
+
     return queryObjects;
   }
   async findAll(page: number, limit: number, search?: string, filters?: any): Promise<PaginationProducts> {
@@ -145,29 +145,27 @@ export class ProductsService {
     if (filters !== undefined && filters !== null && filters !== '' && filters !== '[]') {
       // Filters are not empty
       filtersQuery = this.transformFiltersToQueryObject(JSON.parse(filters));
-      console.log(filtersQuery, "filtersQuery")
       if (search !== undefined && search !== null && search.trim() !== '') {
         // Both filters and search are not empty
-        whereCondition.push({ name: ILike(`%${search}%`), ...Object.assign({}, ...filtersQuery)});
+        whereCondition.push({ name: ILike(`%${search}%`), ...Object.assign({}, ...filtersQuery) });
       } else {
         // Filters are not empty, but search is empty
         // whereCondition.push({...Object.assign({}, ...filtersQuery)});
-        whereCondition.push({...Object.assign({}, ...filtersQuery)});
+        whereCondition.push({ ...Object.assign({}, ...filtersQuery) });
       }
     } else if (search !== undefined && search !== null && search.trim() !== '') {
       // Filters are empty, but search is not empty
       whereCondition.push({ name: ILike(`%${search}%`) });
     }
-  
+
     const query: any = {
       relations: ['brand', 'subCategories', 'sizes', 'images', 'discount', 'colores', 'gender', 'seasone', 'features'],
       skip: (page - 1) * limit,
       take: limit,
       where: whereCondition.length > 0 ? whereCondition : undefined,
     };
-    console.log(query)
     const products = await this.productRepository.find(query);
-  //get total
+    //get total
     const total = await this.productRepository.count();
     return { products, total }
   }

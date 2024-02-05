@@ -41,7 +41,6 @@ export class SubCategoriesService {
 
   async update(id: number, updateSubCategoryDto: UpdateSubCategoryDto): Promise<SubCategory> {
     // await this.subCategoryRepository.update(id, updateSubCategoryDto);
-    console.log(updateSubCategoryDto);
     const updatedSubCategory = await this.subCategoryRepository.findOne({
       where: {
         id,
@@ -55,7 +54,6 @@ export class SubCategoriesService {
         id: updateSubCategoryDto.categoryId,
       },
     });
-    console.log(updatedSubCategory);
     if (updatedSubCategory) {
       await this.subCategoryRepository.update(id, updatedSubCategory);
       return updatedSubCategory;

@@ -26,7 +26,6 @@ export class BrandsService {
     }
 
     brand.description = createBrandDto.description;
-    console.log(brand, 'brand');
 
     try {
       const newBrand = await this.brandRepository.save(brand);
@@ -38,7 +37,6 @@ export class BrandsService {
       if (file) {
         try {
           await removeFile(brand.iconPath);
-          console.log('File removed successfully');
         } catch (removeError) {
           console.error(removeError, 'Error caught during file removal');
         }

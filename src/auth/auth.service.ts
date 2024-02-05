@@ -52,7 +52,6 @@ export class AuthService {
   }
 
   public async refresh(user: User): Promise<string> {
-    console.log(user)
     this.repository.update(user.id, { lastLoginAt: new Date() });
 
     return this.helper.generateToken(user);
