@@ -117,7 +117,7 @@ export class ProductsService {
   transformFiltersToQueryObject(filters: any[]): Record<string, any>[] {
     const queryObjects: Record<string, any>[] = [];
 
-    filters.forEach((filter) => {
+    filters?.forEach((filter) => {
       if (filter.elements && filter.elements.length > 0) {
         const elementIds = filter.elements.map((element: any) => element.id);
         const queryObject: Record<string, any> = {};
