@@ -3,13 +3,13 @@ import { AppModule } from "./app.module";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { ValidationPipe } from "@nestjs/common";
 import * as express from "express";
-// import * as dotenv from "dotenv";
+import * as dotenv from "dotenv";
 import { join } from "path";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // const environment = process.env.NODE_ENV || "development";
-  // const envFileName = environment === "production" ? ".env" : ".env.local";
-  // dotenv.config({ path: envFileName });
+  const environment = process.env.NODE_ENV || "development";
+  const envFileName =".env"
+  dotenv.config({ path: envFileName });
   app.enableCors();
   const config = new DocumentBuilder().setTitle("Web Api").setDescription("The webapi API description").setVersion("1.0").addBearerAuth().addTag("api").build();
   const document = SwaggerModule.createDocument(app, config);
