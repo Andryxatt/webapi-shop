@@ -29,13 +29,13 @@ import { ProductFeaturesModule } from './product-features/product-features.modul
     }),
     TypeOrmModule.forRootAsync({
       imports:[ConfigModule],
-      useFactory: (configService: ConfigService) => ({
+      useFactory: () => ({
         type: 'postgres',
-        host:  configService.get('DB_HOST'),
-        port: +configService.get<number>('DB_PORT') || 5432,
-        username: configService.get('DB_USERNAME'),
-        password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_DATABASE'),
+        host: process.env.DB_HOST,
+        port: parseInt(process.env.DB_PORT) || 5432,
+        username: process.env.DB_USERNAME,
+        password: process.env.DB_PASSWORD as string,
+        database: process.env.DB_DATABASE,
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true,
         autoLoadEntities: true,
