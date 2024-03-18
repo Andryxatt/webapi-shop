@@ -1,5 +1,12 @@
 import { Product } from "../../products/entities/product.entity";
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
 
 @Entity("Features")
 export class Feature {
@@ -13,6 +20,6 @@ export class Feature {
   name: string;
   @Column()
   description: string;
-  @OneToMany(() => Product, product => product.features)
+  @OneToMany(() => Product, (product) => product.features)
   public featuresProduct?: Product[];
 }

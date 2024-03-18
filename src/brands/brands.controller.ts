@@ -1,11 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, Res } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UploadedFile,
+  UseInterceptors,
+  Res,
+} from "@nestjs/common";
 import { BrandsService } from "./brands.service";
 import { CreateBrandDto } from "./dto/create-brand.dto";
 import { UpdateBrandDto } from "./dto/update-brand.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { extname } from "path";
-import { validate } from "class-validator";
 import { Brand } from "./entities/brand.entity";
 @Controller("brands")
 export class BrandsController {
@@ -26,15 +36,14 @@ export class BrandsController {
       }),
     })
   )
-  async create(@Body() createBrandDto: CreateBrandDto, @UploadedFile() file: Express.Multer.File) {
-    // Validate the brand DTO
+  async create(
+    @Body() createBrandDto: CreateBrandDto,
+    @UploadedFile() file: Express.Multer.File
+  ) {
     const brand = new Brand();
     brand.name = createBrandDto.name;
     brand.description = createBrandDto.description;
     brand.iconPath = "default.png";
-    const errors = await validate(brand);
-    console.log("errors", errors);
-
     return this.brandsService.create(createBrandDto, file);
   }
 
@@ -66,7 +75,11 @@ export class BrandsController {
       }),
     })
   )
-  update(@Param("id") id: number, @Body() updateBrandDto: UpdateBrandDto, @UploadedFile() file) {
+  update(
+    @Param("id") id: number,
+    @Body() updateBrandDto: UpdateBrandDto,
+    @UploadedFile() file
+  ) {
     return this.brandsService.update(id, updateBrandDto, file);
   }
 

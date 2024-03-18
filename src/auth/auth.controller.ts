@@ -1,30 +1,19 @@
-import { Body, ClassSerializerInterceptor, Controller, HttpException, HttpStatus, Inject, Post, Req, UseGuards, UseInterceptors } from "@nestjs/common";
-import { AuthService } from "./auth.service";
-import { User } from "src/users/users.entity";
-import { AuthGuard } from "./auth.guard";
-import { RegisterDto, LoginDto } from "./dto/auth.dto";
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { LoginDto, RegisterDto } from './dto/auth.dto';
 
-@Controller("auth")
+@Controller('auth')
 export class AuthController {
-  @Inject(AuthService)
-  private readonly service: AuthService;
+  constructor(private readonly authService: AuthService) {}
 
-  @Post("register")
-  @UseInterceptors(ClassSerializerInterceptor)
-  private register(@Body() body: RegisterDto): Promise<User | never> {
-    return this.service.register(body);
-  }
-  @Post("login")
-  private login(@Body() body: LoginDto): Promise<{ token: string; user: User }> {
-    return this.service.login(body);
+  @Post('login')
+  async login(@Body() loginDto: LoginDto) {
+    return this.authService.login(loginDto);
   }
 
-  @Post("refresh")
-  @UseGuards(AuthGuard)
-  private refresh(@Req() { user }: any): Promise<string | never | any> {
-    if (!user) {
-      throw new HttpException("No user found", HttpStatus.NOT_FOUND);
-    }
-    return this.service.refresh(<User>user);
+  @Post('register')
+  async register(@Body() registerDto: RegisterDto) {
+    return this.authService.register(registerDto);
   }
+
 }

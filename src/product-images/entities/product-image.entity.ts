@@ -1,10 +1,17 @@
+/* eslint-disable prettier/prettier */
 import { Product } from "../../products/entities/product.entity";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 @Entity("ProductImages")
 export class ProductImage {
   @PrimaryGeneratedColumn()
   id: number;
-  @ManyToOne(() => Product, product => product.images, {
+  @ManyToOne(() => Product, (product) => product.images, {
     onDelete: "CASCADE",
   })
   @JoinColumn()

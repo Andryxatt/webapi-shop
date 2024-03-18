@@ -1,27 +1,26 @@
 /* eslint-disable prettier/prettier */
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository, ILike } from 'typeorm';
-import { Product } from './entities/product.entity';
-import { Brand } from 'src/brands/entities/brand.entity';
-import { SubCategory } from 'src/sub-categories/entities/sub-category.entity';
-import { ProductImage } from 'src/product-images/entities/product-image.entity';
-import { ProductToSize } from 'src/product-to-size/entities/product-to-size.entity';
-import { Size } from 'src/sizes/entities/size.entity';
-import * as fs from 'fs';
-import { PaginationProducts } from './dto/paginationProducts';
-import { Discount } from 'src/discount/entities/discount.entity';
-import { ProductFeature } from '@product-features/entities/product-feature.entity';
-import { Feature } from '@features/entities/feature.entity';
-import { Colore } from '@colore/entities/colore.entity';
-import { Seasone } from '@seasone/entities/seasone.entity';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { CreateProductDto } from "./dto/create-product.dto";
+import { UpdateProductDto } from "./dto/update-product.dto";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Between, In, Like, Repository } from "typeorm";
+import { Product } from "./entities/product.entity";
+import { Brand } from "../brands/entities/brand.entity";
+import { SubCategory } from "../sub-categories/entities/sub-category.entity";
+import { ProductImage } from "../product-images/entities/product-image.entity";
+import { ProductToSize } from "../product-to-size/entities/product-to-size.entity";
+import { Size } from "../sizes/entities/size.entity";
+import { PaginationProducts } from "./dto/paginationProducts";
+import { Discount } from "../discount/entities/discount.entity";
+import { ProductFeature } from "@product-features/entities/product-feature.entity";
+import { Feature } from "@features/entities/feature.entity";
+import { Colore } from "@colore/entities/colore.entity";
+import { Seasone } from "@seasone/entities/seasone.entity";
+import * as fs from "fs";
 
 @Injectable()
 export class ProductsService {
   constructor(
-
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
     @InjectRepository(Brand)
@@ -43,12 +42,12 @@ export class ProductsService {
     @InjectRepository(Colore)
     private readonly coloreRepository: Repository<Colore>,
     @InjectRepository(Seasone)
-    private readonly seasoneRepository: Repository<Seasone>,
+    private readonly seasoneRepository: Repository<Seasone>
   ) { }
 
   async create(
     createProductDto: CreateProductDto,
-    files: Array<Express.Multer.File>,
+    files: Array<Express.Multer.File>
   ) {
     const brand = await this.brandRepository.findOneBy({
       id: createProductDto.brandId,
@@ -59,13 +58,19 @@ export class ProductsService {
     const gender = await this.brandRepository.findOneBy({
       id: createProductDto.genderId,
     });
-    const discount = await this.discountRepository.findOneBy({ id: createProductDto.discountId });
+    const discount = await this.discountRepository.findOneBy({
+      id: createProductDto.discountId,
+    });
 
-    const subCategoriesIds = JSON.parse("" + createProductDto.subCategories + "");
+    const subCategoriesIds = JSON.parse(
+      "" + createProductDto.subCategories + ""
+    );
     const subCategories = await this.subCategoryRepository.findBy({
       id: In(subCategoriesIds),
     });
-    const coloresIds: Array<number> = JSON.parse("" + createProductDto.colores + "");
+    const coloresIds: Array<number> = JSON.parse(
+      "" + createProductDto.colores + ""
+    );
     const coloresAdded = await this.coloreRepository.findBy({
       id: In(coloresIds),
     });
@@ -84,11 +89,16 @@ export class ProductsService {
       colores: coloresAdded,
     });
 
-    if (createProductDto.features !== null || createProductDto.features !== undefined) {
+    if (
+      createProductDto.features !== null ||
+      createProductDto.features !== undefined
+    ) {
       const features = JSON.parse("" + createProductDto.features + "");
       features.forEach(async (element) => {
         const productFeature = new ProductFeature();
-        productFeature.feature = await this.featureRepository.findOneBy({ id: element.featureId });
+        productFeature.feature = await this.featureRepository.findOneBy({
+          id: element.featureId,
+        });
         productFeature.description = element.description;
         productFeature.product = product;
         await this.productFeatureRepository.save(productFeature);
@@ -101,101 +111,167 @@ export class ProductsService {
         productImage.product = product;
         await this.productImageRepository.save(productImage);
       });
-    };
-    if (createProductDto.sizes !== null || createProductDto.sizes !== undefined) {
+    }
+    if (
+      createProductDto.sizes !== null ||
+      createProductDto.sizes !== undefined
+    ) {
       const sizes = JSON.parse("" + createProductDto.sizes + "");
       sizes.forEach(async (element) => {
         const sizeToProduct = new ProductToSize();
         sizeToProduct.product = product;
-        sizeToProduct.size = await this.sizeRepository.findOneBy({ id: element.sizeId });
+        sizeToProduct.size = await this.sizeRepository.findOneBy({
+          id: element.sizeId,
+        });
         sizeToProduct.quantity = element.quantity;
         await this.productToSizeRepository.save(sizeToProduct);
       });
     }
     return product;
   }
-  transformFiltersToQueryObject(filters: any[]): Record<string, any>[] {
-    const queryObjects: Record<string, any>[] = [];
 
-    filters?.forEach((filter) => {
-      if (filter.elements && filter.elements.length > 0) {
-        const elementIds = filter.elements.map((element: any) => element.id);
-        const queryObject: Record<string, any> = {};
-        if (filter.name === 'subCategories') {
-          queryObject[filter.name] = {
-            category: {
-              id: In(elementIds)
-            }
-          }
-        }
-        else {
-          queryObject[filter.name] = In(elementIds);
-
-        }
-        queryObjects.push(queryObject);
-      }
-    });
-
-    return queryObjects;
-  }
-  async findAll(page: number, limit: number, search?: string, filters?: any): Promise<PaginationProducts> {
-    const whereCondition: any[] = []
-    let filtersQuery: Record<string, any>[] = [];
-    // Check if filters is not null or undefined before processing
-    if (filters !== undefined && filters !== null && filters !== '' && filters !== '[]') {
-      // Filters are not empty
-      filtersQuery = this.transformFiltersToQueryObject(JSON.parse(filters));
-      if (search !== undefined && search !== null && search.trim() !== '') {
-        // Both filters and search are not empty
-        whereCondition.push({ name: ILike(`%${search}%`), ...Object.assign({}, ...filtersQuery) });
+  async findAll(findProductsDto: any): Promise<PaginationProducts> {
+    const jsonFilters = JSON.parse(findProductsDto);
+    const whereCondition: Record<string, any>[] = [];
+    if (
+      jsonFilters.minPrice !== undefined &&
+      jsonFilters.maxPrice !== undefined
+    ) {
+      const minPrice = parseInt(jsonFilters.minPrice);
+      const maxPrice = parseInt(jsonFilters.maxPrice);
+      whereCondition.push({ price: Between(minPrice, maxPrice) });
+    }
+    if (jsonFilters.search) {
+      const searchCondition = { name: Like(`%${jsonFilters.search}%`) };
+      if (whereCondition.length > 0) {
+        Object.assign(whereCondition[0], searchCondition);
       } else {
-        // Filters are not empty, but search is empty
-        // whereCondition.push({...Object.assign({}, ...filtersQuery)});
-        whereCondition.push({ ...Object.assign({}, ...filtersQuery) });
+        whereCondition.push(searchCondition);
       }
-    } else if (search !== undefined && search !== null && search.trim() !== '') {
-      // Filters are empty, but search is not empty
-      whereCondition.push({ name: ILike(`%${search}%`) });
+    }
+    if (jsonFilters.brands && jsonFilters.brands.length > 0) {
+      const brandCondition = { brand: In(jsonFilters.brands) };
+      if (whereCondition.length > 0) {
+        Object.assign(whereCondition[0], brandCondition);
+      } else {
+        whereCondition.push(brandCondition);
+      }
+    }
+    if (
+      jsonFilters.categories.length > 0 &&
+      jsonFilters.subCategories.length === 0
+    ) {
+      const catConditions = {
+        subCategories: {
+          category: In(jsonFilters.categories),
+        },
+      };
+      if (whereCondition.length > 0) {
+        Object.assign(whereCondition[0], catConditions);
+      } else {
+        whereCondition.push(catConditions);
+      }
+    } else if (
+      jsonFilters.subCategories &&
+      jsonFilters.subCategories.length > 0
+    ) {
+      const subConditions = {
+        subCategories: {
+          id: In(jsonFilters.subCategories),
+        },
+      };
+      if (whereCondition.length > 0) {
+        Object.assign(whereCondition[0], subConditions);
+      } else {
+        whereCondition.push(subConditions);
+      }
+    }
+    if (jsonFilters.colores && jsonFilters.colores.length > 0) {
+      const coloresCondition = {
+        colores: {
+          id: In(jsonFilters.colores),
+        },
+      };
+      if (whereCondition.length > 0) {
+        Object.assign(whereCondition[0], coloresCondition);
+      } else {
+        whereCondition.push(coloresCondition);
+      }
     }
 
-    const query: any = {
-      relations: ['brand', 'subCategories', 'sizes', 'images', 'discount', 'colores', 'gender', 'seasone', 'features'],
-      skip: (page - 1) * limit,
-      take: limit,
-      where: whereCondition.length > 0 ? whereCondition : undefined,
+    const products = await this.productRepository.find({
+      relations: [
+        "brand",
+        "subCategories",
+        "sizes",
+        "images",
+        "discount",
+        "colores",
+        "features",
+        "features.feature",
+      ],
+      order: {
+        createdAt: "DESC",
+      },
+      take: jsonFilters.limit,
+      where: whereCondition.length > 0 ? whereCondition : {},
+    });
+    return {
+      products,
+      total: products.length,
     };
-    const products = await this.productRepository.find(query);
-    //get total
-    const total = await this.productRepository.count();
-    return { products, total }
   }
 
   findOne(id: number): Promise<Product> {
-    const product = this.productRepository.findOne({ relations: ['brand', 'subCategories', 'sizes', 'images'], where: { id: id } });
-    return product
+    const product = this.productRepository.findOne({
+      relations: ["brand", "subCategories", "sizes", "images"],
+      where: { id: id },
+    });
+    return product;
+  }
+  likeProduct(id: number): Promise<Product> {
+    const product = this.productRepository.findOne({ where: { id: id } });
+    if (!product) {
+      throw new NotFoundException("Entity not found");
+    }
+    product.then((product) => {
+      product.likes += 1;
+      this.productRepository.save(product);
+    });
+    return product;
   }
 
-  async update(id: number, updateProductDto: UpdateProductDto, files: Array<Express.Multer.File>) {
+  async update(
+    id: number,
+    updateProductDto: UpdateProductDto,
+    files: Array<Express.Multer.File>
+  ) {
     const product = await this.productRepository.findOne({
       where: { id: id },
-      relations: ['images', 'sizes', 'subCategories', 'brand']
+      relations: ["images", "sizes", "subCategories", "brand"],
     });
     if (!product) {
-      throw new NotFoundException('Entity not found');
+      0;
+      throw new NotFoundException("Entity not found");
     }
     product.name = updateProductDto.name;
     product.model = updateProductDto.model;
     product.description = updateProductDto.description;
     product.price = updateProductDto.price;
-    product.discount = await this.discountRepository.findOneBy({ id: Number(updateProductDto.discountId) });
+    product.discount = await this.discountRepository.findOneBy({
+      id: Number(updateProductDto.discountId),
+    });
     product.curencyPrice = updateProductDto.curencyPrice;
-    product.brand = await this.brandRepository.findOneBy({ id: Number(updateProductDto.brandId) });
-    const array = JSON.parse(updateProductDto.subCategories.toString()).map(Number);
+    product.brand = await this.brandRepository.findOneBy({
+      id: Number(updateProductDto.brandId),
+    });
+    const array = JSON.parse(updateProductDto.subCategories.toString()).map(
+      Number
+    );
     product.subCategories = await this.subCategoryRepository.findBy({
       id: In(array),
     });
     const updatedProduct = await this.productRepository.save(product);
-
 
     files?.forEach(async (image) => {
       const productImage = new ProductImage();
@@ -204,18 +280,25 @@ export class ProductsService {
       await this.productImageRepository.save(productImage);
     });
     // //TODO update product sizes
-    if (updateProductDto.sizes !== null || updateProductDto.sizes !== undefined) {
+    if (
+      updateProductDto.sizes !== null ||
+      updateProductDto.sizes !== undefined
+    ) {
       const sizes = JSON.parse("" + updateProductDto.sizes + "");
       sizes.forEach(async (element) => {
-        const sizeProduct = await this.productToSizeRepository.findOneBy({ size: { id: element.sizeId }, product: { id: updatedProduct.id } });
+        const sizeProduct = await this.productToSizeRepository.findOneBy({
+          size: { id: element.sizeId },
+          product: { id: updatedProduct.id },
+        });
         if (sizeProduct !== null && sizeProduct !== undefined) {
           sizeProduct.quantity = Number(element.quantity);
           await this.productToSizeRepository.save(sizeProduct);
-        }
-        else {
+        } else {
           const sizeToProduct = new ProductToSize();
           sizeToProduct.product = updatedProduct;
-          sizeToProduct.size = await this.sizeRepository.findOneBy({ id: element.sizeId });
+          sizeToProduct.size = await this.sizeRepository.findOneBy({
+            id: element.sizeId,
+          });
           sizeToProduct.quantity = Number(element.quantity);
           await this.productToSizeRepository.save(sizeToProduct);
         }
@@ -227,7 +310,7 @@ export class ProductsService {
   async remove(id: number) {
     const product = await this.productRepository.findOne({
       where: { id: id },
-      relations: ['images']
+      relations: ["images"],
     });
     product.images.forEach((image) => {
       fs.unlink(image.imagePath, (err) => {
@@ -240,9 +323,18 @@ export class ProductsService {
   }
   async topNew(): Promise<PaginationProducts> {
     const products = await this.productRepository.find({
-      relations: ['brand', 'subCategories', 'sizes', 'images', 'discount', 'colores', 'features', 'features.feature'],
+      relations: [
+        "brand",
+        "subCategories",
+        "sizes",
+        "images",
+        "discount",
+        "colores",
+        "features",
+        "features.feature",
+      ],
       order: {
-        createdAt: 'DESC',
+        createdAt: "DESC",
       },
     });
     return { products, total: products.length };

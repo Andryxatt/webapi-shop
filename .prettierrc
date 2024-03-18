@@ -1,7 +1,0 @@
-{
-  "semi": true,
-  "singleQuote": false,
-  "printWidth": 180,
-  "tabWidth": 2,
-  "arrowParens": "avoid"
-}

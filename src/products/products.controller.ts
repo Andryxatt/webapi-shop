@@ -1,4 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFiles, Res, UseGuards, Query } from "@nestjs/common";
+/* eslint-disable prettier/prettier */
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors,
+  UploadedFiles,
+  Res,
+  Query,
+} from "@nestjs/common";
 import { ProductsService } from "./products.service";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { UpdateProductDto } from "./dto/update-product.dto";
@@ -15,7 +28,10 @@ export class ProductsController {
 
   @Post()
   @UseInterceptors(FilesInterceptor("files", 20, multerOptions))
-  create(@Body() createProductDto: CreateProductDto, @UploadedFiles() files: Array<Express.Multer.File>) {
+  create(
+    @Body() createProductDto: CreateProductDto,
+    @UploadedFiles() files: Array<Express.Multer.File>
+  ) {
     return this.productsService.create(createProductDto, files);
   }
   @Get("uploads/files/products/:fileId")
@@ -23,14 +39,17 @@ export class ProductsController {
     res.sendFile(fileId, { root: "uploads/files/products" });
   }
   @Get()
-  findAll(@Query("page") page = 1, @Query("limit") limit: number, @Query("search") search?: string, @Query("filters") filters?: any[]) {
-    return this.productsService.findAll(Number(page), Number(limit), search, filters);
+  findAll(@Query("findProductsDto") findProductsDto: any) {
+    return this.productsService.findAll(findProductsDto);
   }
   @Get("newProducts")
   topNewProducts() {
     return this.productsService.topNew();
   }
-
+  @Post("like/:id")
+  like(@Param("id") id: string) {
+    return this.productsService.likeProduct(+id);
+  }
   @Get(":id")
   async findOne(@Param("id") id: string): Promise<Product> {
     return await this.productsService.findOne(+id);
@@ -38,7 +57,11 @@ export class ProductsController {
 
   @Patch(":id")
   @UseInterceptors(FilesInterceptor("files", 20, multerOptions))
-  update(@Param("id") id: string, @Body() updateProductDto: UpdateProductDto, @UploadedFiles() files: Array<Express.Multer.File>) {
+  update(
+    @Param("id") id: string,
+    @Body() updateProductDto: UpdateProductDto,
+    @UploadedFiles() files: Array<Express.Multer.File>
+  ) {
     return this.productsService.update(Number(id), updateProductDto, files);
   }
 

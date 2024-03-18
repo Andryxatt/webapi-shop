@@ -1,15 +1,15 @@
-import { Injectable } from '@nestjs/common';
-import { CreateSizeDto } from './dto/create-size.dto';
-import { UpdateSizeDto } from './dto/update-size.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Size } from './entities/size.entity';
+import { Injectable } from "@nestjs/common";
+import { CreateSizeDto } from "./dto/create-size.dto";
+import { UpdateSizeDto } from "./dto/update-size.dto";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Size } from "./entities/size.entity";
 
 @Injectable()
 export class SizesService {
   constructor(
     @InjectRepository(Size)
-    private sizeRepository: Repository<Size>,
+    private sizeRepository: Repository<Size>
   ) {}
   create(createSizeDto: CreateSizeDto): Promise<Size> {
     return this.sizeRepository.save(createSizeDto);

@@ -1,6 +1,7 @@
+/* eslint-disable prettier/prettier */
 import { ApiProperty } from "@nestjs/swagger";
 import { CreateProductFeatureDto } from "@product-features/dto/create-product-feature.dto";
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsDecimal, IsNotEmpty, IsString } from "class-validator";
 import { Unique } from "typeorm";
 export class CreateProductDto {
   @IsString()
@@ -20,7 +21,8 @@ export class CreateProductDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  price: string;
+  @IsDecimal({ decimal_digits: "1,2" })
+  price: number;
   @ApiProperty()
   @IsString()
   curencyPrice: string;
@@ -32,6 +34,8 @@ export class CreateProductDto {
   seasoneId?: number;
   @ApiProperty()
   discountId?: number;
+  @ApiProperty()
+  likes?: number;
   @ApiProperty({
     isArray: true,
   })

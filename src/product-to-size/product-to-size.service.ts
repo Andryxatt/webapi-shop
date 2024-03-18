@@ -1,18 +1,18 @@
-import { Injectable } from '@nestjs/common';
-import { CreateProductToSizeDto } from './dto/create-product-to-size.dto';
-import { UpdateProductToSizeDto } from './dto/update-product-to-size.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { ProductToSize } from './entities/product-to-size.entity';
+import { Injectable } from "@nestjs/common";
+import { CreateProductToSizeDto } from "./dto/create-product-to-size.dto";
+import { UpdateProductToSizeDto } from "./dto/update-product-to-size.dto";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { ProductToSize } from "./entities/product-to-size.entity";
 
 @Injectable()
 export class ProductToSizeService {
   constructor(
     @InjectRepository(ProductToSize)
-    private readonly productToSizeRepository: Repository<ProductToSize>,
+    private readonly productToSizeRepository: Repository<ProductToSize>
   ) {}
   create(
-    createProductToSizeDto: CreateProductToSizeDto,
+    createProductToSizeDto: CreateProductToSizeDto
   ): Promise<ProductToSize> {
     return this.productToSizeRepository.save(createProductToSizeDto);
   }

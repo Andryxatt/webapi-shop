@@ -6,10 +6,12 @@ export class CreateBrandDto {
   @ApiProperty()
   @IsNotEmpty()
   name: string;
+
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
   iconPath: string;
+  
   @ApiProperty()
   @IsString()
   @IsNotEmpty()

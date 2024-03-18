@@ -9,7 +9,7 @@ import * as fs from "fs";
 export class ProductImagesService {
   constructor(
     @InjectRepository(ProductImage)
-    private productImageRepository: Repository<ProductImage>,
+    private productImageRepository: Repository<ProductImage>
   ) {}
   create(createProductImageDto: CreateProductImageDto): Promise<ProductImage> {
     return this.productImageRepository.save(createProductImageDto);
@@ -29,7 +29,7 @@ export class ProductImagesService {
 
   async remove(id: number) {
     const image = this.productImageRepository.findOneBy({ id: id });
-    fs.unlink((await image).imagePath, err => {
+    fs.unlink((await image).imagePath, (err) => {
       if (err) {
         console.error(err);
       }

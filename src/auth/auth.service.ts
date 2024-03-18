@@ -1,59 +1,75 @@
-/* eslint-disable prettier/prettier */
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../users/users.entity';
-import { Repository } from 'typeorm';
-import { RegisterDto, LoginDto } from '../auth/dto/auth.dto';
-import { AuthHelper } from './auth.helper';
-
+// auth.service.ts
+import { Inject, Injectable, NotFoundException, UnauthorizedException, forwardRef } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { UserService } from '../user/user.service';
+import { LoginDto, RegisterDto } from './dto/auth.dto';
+import * as bcrypt from 'bcryptjs'; 
 @Injectable()
 export class AuthService {
-  @InjectRepository(User)
-  private readonly repository: Repository<User>;
+  constructor(
+    @Inject(forwardRef(() => UserService))//<--- here
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+  ) {}
+  async validateUser(email: string, password: string): Promise<any> {
 
-  @Inject(AuthHelper)
-  private readonly helper: AuthHelper;
+    const user = await this.userService.findOne(email);
+    if (!user) throw new NotFoundException('Email Does not exist');
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) throw new UnauthorizedException('Invalid Password');
+    return user;}
+  //compare passwordasync comparePasswords(password: string,hashedPassword: string): Promise<any> {return bcrypt.compare(password, hashedPassword).then((isMatch) => {if (isMatch) return true;return false;}).catch((err) => err);}
+  // async validateUser(email: string, password: string): Promise<any> {
+  //   const user = await this.userService.findOne(email);
+  //   if (user) {
+  //     const isPasswordValid = await bcrypt.compare(password, user.password);
+  //     if (isPasswordValid) {
+  //       const { password, ...result } = user;
+  //       return result;
+  //     }
+  //   }
+  //   return null;
+  // }
 
-  public async register(body: RegisterDto): Promise<User | never> {
-    const { username, email, password }: RegisterDto = body;
-    let user: User = await this.repository.findOne({ where: { email } });
-
-    if (user) {
-      throw new HttpException('Conflict', HttpStatus.CONFLICT);
-    }
-
-    user = new User();
-
-    user.username = username;
-    user.email = email;
-    user.password = this.helper.encodePassword(password);
-
-    return this.repository.save(user);
-  }
-
-  public async login(body: LoginDto): Promise<{token: string, user: User}> {
-    const { email, password }: LoginDto = body;
-
-    const user: User = await this.repository.findOne({ where: { email } });
-
+  async login(loginDto: LoginDto) {
+    const user = await this.validateUser(loginDto.email, loginDto.password);
     if (!user) {
-      throw new HttpException('No user found', HttpStatus.NOT_FOUND);
+      return null;
     }
-
-    const isPasswordValid: boolean = this.helper.isPasswordValid(password, user.password);
-
-    if (!isPasswordValid) {
-      throw new HttpException('No user found', HttpStatus.NOT_FOUND);
-    }
-
-    this.repository.update(user.id, { lastLoginAt: new Date() });
-    const token = this.helper.generateToken(user);
-    return {token, user: user}
+    const payload = { email: user.email, sub: user.uuid };
+    console.log('payload', this.jwtService.sign(payload));
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
   }
 
-  public async refresh(user: User): Promise<string> {
-    this.repository.update(user.id, { lastLoginAt: new Date() });
-
-    return this.helper.generateToken(user);
+  async register(registerDto: RegisterDto) {
+    // You can implement registration logic here
+    // Make sure to hash the password before saving it to the database
+    return 'Registration logic here';
+  }
+  async googleAuth(req) {
+    if (!req.user) {
+      return 'No user from google';
+    }
+    return {
+      message: 'User information from google',
+      user: req.user,
+    };
+  }
+  async validateOAuthLogin(email: string): Promise<any> {
+    return await this.userService.findOne(email);
+  }
+  async facebookAuth(req) {
+    if (!req.user) {
+      return 'No user from facebook';
+    }
+    return {
+      message: 'User information from facebook',
+      user: req.user,
+    };
+  }
+  async validateFacebookLogin(email: string): Promise<any> {
+    return await this.userService.findOne(email);
   }
 }

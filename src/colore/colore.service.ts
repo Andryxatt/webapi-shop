@@ -9,7 +9,7 @@ import { Colore } from "./entities/colore.entity";
 export class ColoreService {
   constructor(
     @InjectRepository(Colore)
-    private readonly coloreRepository: Repository<Colore>,
+    private readonly coloreRepository: Repository<Colore>
   ) {}
   create(createColoreDto: CreateColoreDto) {
     return this.coloreRepository.save(createColoreDto);

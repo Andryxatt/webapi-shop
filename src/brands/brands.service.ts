@@ -1,20 +1,19 @@
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
-import { CreateBrandDto } from './dto/create-brand.dto';
-import { UpdateBrandDto } from './dto/update-brand.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Brand } from './entities/brand.entity';
-import { removeFile } from '../utils/remove-file';
+import { Injectable } from "@nestjs/common";
+import { CreateBrandDto } from "./dto/create-brand.dto";
+import { UpdateBrandDto } from "./dto/update-brand.dto";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Brand } from "./entities/brand.entity";
+import { removeFile } from "../utils/remove-file";
+import { STATUS_CODES } from "http";
 @Injectable()
 export class BrandsService {
   constructor(
     @InjectRepository(Brand)
-    private readonly brandRepository: Repository<Brand>,
-  ) {
-    
-   }
-   
+    private readonly brandRepository: Repository<Brand>
+  ) {}
+
   async create(createBrandDto: CreateBrandDto, file: any): Promise<Brand> {
     const brand = new Brand();
     brand.name = createBrandDto.name;
@@ -22,7 +21,7 @@ export class BrandsService {
     if (file) {
       brand.iconPath = file.path;
     } else {
-      brand.iconPath = 'default.png';
+      brand.iconPath = "default.png";
     }
 
     brand.description = createBrandDto.description;
@@ -31,14 +30,14 @@ export class BrandsService {
       const newBrand = await this.brandRepository.save(brand);
       return newBrand;
     } catch (error) {
-      console.error(error, 'Error caught during brand save');
+      console.error(error, "Error caught during brand save");
 
       // Remove the file if it was created and log any error during removal
       if (file) {
         try {
           await removeFile(brand.iconPath);
         } catch (removeError) {
-          console.error(removeError, 'Error caught during file removal');
+          console.error(removeError, "Error caught during file removal");
         }
       }
 
@@ -52,12 +51,16 @@ export class BrandsService {
   }
 
   async findOne(id: number): Promise<Brand> {
-    const brand = await this.brandRepository.findOneBy({ id: id });
+    const brand = await this.brandRepository.findOne({where: {id: id}});
     return brand;
   }
 
-  async update(id: number, updateBrandDto: UpdateBrandDto, file: any): Promise<Brand> {
-    const brand = await this.brandRepository.findOneBy({ id: id });
+  async update(
+    id: number,
+    updateBrandDto: UpdateBrandDto,
+    file: any
+  ): Promise<Brand> {
+    const brand = await this.brandRepository.findOne({where:{ id: id }});
     if (file !== undefined && file !== null) {
       await removeFile(brand.iconPath);
       brand.iconPath = file.path;
@@ -69,14 +72,19 @@ export class BrandsService {
   }
 
   async remove(id: number) {
-    const brand = await this.brandRepository.findOneBy({ id: id });
-    try {
-      await removeFile(brand.iconPath);
-    }
-    catch (err) {
-      console.log(err);
+    const brand = await this.brandRepository.findOne({ where: { id: id } });
+    if (!brand) {
+      return STATUS_CODES.NOT_FOUND; // Returning HTTP status code for not found
     }
 
-    return this.brandRepository.delete(id);
+    try {
+      await removeFile(brand.iconPath);
+    } catch (err) {
+      console.log(err);
+      throw new Error("Error removing file");
+    }
+    finally {
+      return this.brandRepository.remove(brand);
+    }
   }
 }

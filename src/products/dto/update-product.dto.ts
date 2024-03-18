@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { CreateSizeProdDto } from "./create-product.dto";
 import { CreateProductFeatureDto } from "@product-features/dto/create-product-feature.dto";
-import { IsString, IsNotEmpty } from "class-validator";
+import { IsString, IsNotEmpty, IsDecimal } from "class-validator";
 
 export class UpdateProductDto {
   @IsString()
@@ -20,7 +20,8 @@ export class UpdateProductDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  price: string;
+  @IsDecimal({ decimal_digits: "1,2" })
+  price: number;
   @ApiProperty()
   @IsString()
   curencyPrice: string;

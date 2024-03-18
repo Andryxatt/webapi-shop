@@ -1,8 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ProductFeaturesController } from './product-features.controller';
-import { ProductFeaturesService } from './product-features.service';
+import { Test, TestingModule } from "@nestjs/testing";
+import { ProductFeaturesController } from "./product-features.controller";
+import { ProductFeaturesService } from "./product-features.service";
 
-describe('ProductFeaturesController', () => {
+describe("ProductFeaturesController", () => {
   let controller: ProductFeaturesController;
 
   beforeEach(async () => {
@@ -11,7 +11,9 @@ describe('ProductFeaturesController', () => {
       providers: [ProductFeaturesService],
     }).compile();
 
-    controller = module.get<ProductFeaturesController>(ProductFeaturesController);
+    controller = module.get<ProductFeaturesController>(
+      ProductFeaturesController
+    );
   });
 
   it("should be defined", () => {

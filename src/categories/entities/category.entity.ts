@@ -9,7 +9,7 @@ export class Category {
   name: string;
   @Column()
   description: string;
-  @OneToMany(() => SubCategory, subCategory => subCategory.category, {
+  @OneToMany(() => SubCategory, (subCategory) => subCategory.category, {
     onDelete: "CASCADE",
   })
   subCategories: SubCategory[];

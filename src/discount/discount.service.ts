@@ -9,7 +9,7 @@ import { Discount } from "./entities/discount.entity";
 export class DiscountService {
   constructor(
     @InjectRepository(Discount)
-    private discountRepository: Repository<Discount>,
+    private discountRepository: Repository<Discount>
   ) {}
   create(createDiscountDto: CreateDiscountDto) {
     return this.discountRepository.save(createDiscountDto);

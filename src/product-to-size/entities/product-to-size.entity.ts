@@ -6,12 +6,12 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 export class ProductToSize {
   @PrimaryGeneratedColumn()
   id: number;
-  @ManyToOne(() => Product, p => p.sizes, {
+  @ManyToOne(() => Product, (p) => p.sizes, {
     onDelete: "CASCADE",
   })
   product: Product;
 
-  @ManyToOne(() => Size, s => s.sizesProduct, {
+  @ManyToOne(() => Size, (s) => s.sizesProduct, {
     eager: true,
   })
   size: Size;

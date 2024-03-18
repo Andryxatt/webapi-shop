@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { ProductFeature } from "../../product-features/entities/product-feature.entity";
 import { Brand } from "../../brands/entities/brand.entity";
 import { Colore } from "../../colore/entities/colore.entity";
@@ -8,7 +9,18 @@ import { ProductImage } from "../../product-images/entities/product-image.entity
 import { ProductToSize } from "../../product-to-size/entities/product-to-size.entity";
 import { Seasone } from "../../seasone/entities/seasone.entity";
 import { SubCategory } from "../../sub-categories/entities/sub-category.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
 @Entity("Products")
 export class Product {
   @PrimaryGeneratedColumn()
@@ -21,60 +33,62 @@ export class Product {
   updatedAt: Date;
   @Column({ unique: true })
   model: string;
-  @Column()
-  price: string;
+  @Column({ type: "decimal", precision: 10, scale: 2 }) // Example precision and scale for decimal type
+  price: number;
   @Column()
   curencyPrice: string;
   @Column()
   description?: string;
+  @Column({ default: 0 })
+  likes?: number;
   @Column({ default: "доступний" })
   status: string;
-  @ManyToOne(() => Brand, brand => brand.products, {
+  @ManyToOne(() => Brand, (brand) => brand.products, {
     eager: true,
   })
   @JoinColumn()
   brand: Brand;
-  @ManyToOne(() => Seasone, seasone => seasone.products, {
+  @ManyToOne(() => Seasone, (seasone) => seasone.products, {
     eager: true,
   })
   @JoinColumn()
   seasone: Seasone;
-  @ManyToOne(() => Gender, gender => gender.products, {
+  @ManyToOne(() => Gender, (gender) => gender.products, {
     eager: true,
   })
   @JoinColumn()
   gender: Gender;
-  @ManyToOne(() => Discount, discount => discount.products, {
+  @ManyToOne(() => Discount, (discount) => discount.products, {
     eager: true,
   })
   @JoinColumn()
   discount: Discount;
-  @ManyToMany(() => SubCategory, subCategory => subCategory.products, {
+  @ManyToMany(() => SubCategory, (subCategory) => subCategory.products, {
     onDelete: "CASCADE",
   })
   @JoinTable()
   subCategories: SubCategory[];
 
-  @OneToMany(() => ProductFeature, feature => feature.product, {
+  @OneToMany(() => ProductFeature, (feature) => feature.product, {
     onDelete: "CASCADE",
   })
   features: ProductFeature[];
 
-  @ManyToMany(() => Colore, colore => colore.products, {
+  @ManyToMany(() => Colore, (colore) => colore.products, {
     onDelete: "CASCADE",
   })
   @JoinTable()
   colores: Colore[];
 
-  @OneToMany(() => ProductToSize, ps => ps.product, {
+  @OneToMany(() => ProductToSize, (ps) => ps.product, {
     onDelete: "CASCADE",
   })
   sizes: ProductToSize[];
 
-  @OneToMany(() => ProductImage, productImage => productImage.product, {
+  @OneToMany(() => ProductImage, (productImage) => productImage.product, {
     onDelete: "CASCADE",
   })
   images: ProductImage[];
-  @OneToMany(() => OrderItem, order_items => order_items.product)
+  @OneToMany(() => OrderItem, (order_items) => order_items.product)
   orderItems: OrderItem[];
 }

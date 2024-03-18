@@ -1,5 +1,12 @@
 import { Product } from "../../products/entities/product.entity";
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
 
 @Entity("Discounts")
 export class Discount {
@@ -11,6 +18,6 @@ export class Discount {
   updatedAt: Date;
   @Column()
   percentage: number;
-  @OneToMany(() => Product, product => product.discount)
+  @OneToMany(() => Product, (product) => product.discount)
   products: Product[];
 }

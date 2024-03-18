@@ -9,12 +9,12 @@ export class ProductFeature {
   @Column()
   description: string;
 
-  @ManyToOne(() => Product, product => product.features, {
+  @ManyToOne(() => Product, (product) => product.features, {
     onDelete: "CASCADE",
   })
   product: Product;
 
-  @ManyToOne(() => Feature, feature => feature.featuresProduct, {
+  @ManyToOne(() => Feature, (feature) => feature.featuresProduct, {
     eager: true,
   })
   feature: Feature;

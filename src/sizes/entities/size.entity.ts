@@ -13,6 +13,6 @@ export class Size {
   Length: string;
   @Column()
   USA?: string;
-  @OneToMany(() => Product, product => product.sizes)
+  @OneToMany(() => Product, (product) => product.sizes)
   public sizesProduct?: Product[];
 }

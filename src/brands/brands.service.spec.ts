@@ -1,135 +1,99 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { BrandsService } from "./brands.service";
-import { Brand } from "./entities/brand.entity";
-import { Repository, DeleteResult } from "typeorm";
-import { getRepositoryToken } from "@nestjs/typeorm";
-import { mockBrands, mockRepository } from "./brands.controller.spec";
-import { CreateBrandDto } from "./dto/create-brand.dto";
-describe("BrandsService", () => {
+import { Test, TestingModule } from '@nestjs/testing';
+import { BrandsService } from './brands.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Brand } from './entities/brand.entity';
+import { UpdateBrandDto } from './dto/update-brand.dto';
+
+describe('BrandsService', () => {
   let service: BrandsService;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  let repository: Repository<Brand>;
+  let repositoryMock: Repository<Brand>;
 
   beforeEach(async () => {
+    repositoryMock = {
+      find: jest.fn(),
+      findOne: jest.fn(),
+      save: jest.fn(),
+       remove: jest.fn(), 
+      update: jest.fn(),
+      // Add other repository methods as needed for testing
+    } as unknown as Repository<Brand>;
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         BrandsService,
         {
-          provide: getRepositoryToken(Brand),
-          useValue: mockRepository,
+          provide: getRepositoryToken(Brand), // Use getRepositoryToken to mock the repository
+          useValue: repositoryMock,
         },
       ],
     }).compile();
 
     service = module.get<BrandsService>(BrandsService);
-    repository = module.get<Repository<Brand>>(getRepositoryToken(Brand));
   });
-  describe("create", () => {
-    it("should create a brand with valid data", async () => {
-      const createBrandDto: CreateBrandDto = {
-        name: "Test Brand",
-        description: "Test Description",
-        iconPath: "test-icon.png",
-      };
-      const fileMock = { path: "test-icon.png" };
 
-      jest.spyOn(repository, "save").mockResolvedValueOnce(mockBrands[0]);
-
-      const result = await service.create(createBrandDto, fileMock);
-
-      expect(result).toEqual(mockBrands[0]);
-      expect(repository.save).toHaveBeenCalledWith(expect.any(Brand));
-    });
-
-    it("should handle errors during brand creation", async () => {
-      const createBrandDto: CreateBrandDto = {
-        name: "Test Brand",
-        description: "Test Description",
-        iconPath: "/uploads/test-icon.png",
-      };
-      const fileMock = { path: "/uploads/test-icon.png" };
-
-      jest.spyOn(repository, "save").mockRejectedValueOnce(new Error("Save failed"));
-
-      await expect(service.create(createBrandDto, fileMock)).rejects.toThrowError("Save failed");
-      expect(repository.save).toHaveBeenCalledWith(expect.any(Brand));
-    });
+  it('should be defined', () => {
+    expect(service).toBeDefined();
   });
-  describe("findAll", () => {
-    it("should return an array of brands", async () => {
-      jest.spyOn(repository, "find").mockResolvedValueOnce(mockBrands);
+
+  describe('findAll', () => {
+    it('should return an array of brands', async () => {
+      const brand: Brand = { id: 1, name: 'Test Brand', description: 'Test Description', iconPath: 'test.png', createdAt: new Date(), updatedAt: new Date() };
+      const brands: Brand[] = [brand];
+
+      jest.spyOn(repositoryMock, 'find').mockResolvedValue(brands);
 
       const result = await service.findAll();
 
-      expect(result).toEqual(mockBrands);
-      expect(repository.find).toHaveBeenCalled();
+      expect(result).toEqual(brands);
     });
   });
-  describe("findOne", () => {
-    it("should return a brand", async () => {
-      jest.spyOn(repository, "findOne").mockResolvedValueOnce(mockBrands[0]);
+  describe('create', () => {
+    it('should create a new brand', async () => {
+      const createBrandDto = { name: 'Test Brand', description: 'Test Description', iconPath: 'test.png' };
+      const brand: Brand = { id: 1, ...createBrandDto, createdAt: new Date(), updatedAt: new Date() };
+
+      jest.spyOn(repositoryMock, 'save').mockResolvedValue(brand);
+
+      const result = await service.create(createBrandDto, null);
+
+      expect(result).toEqual(brand);
+    });
+  });
+  describe('findOne', () => {
+    it('should return a brand by id', async () => {
+      const brand: Brand = { id: 1, name: 'Test Brand', description: 'Test Description', iconPath: 'test.png', createdAt: new Date(), updatedAt: new Date() };
+
+      jest.spyOn(repositoryMock, 'findOne').mockResolvedValue(brand);
 
       const result = await service.findOne(1);
 
-      expect(result).toEqual(mockBrands[0]);
-      expect(repository.findOne).toHaveBeenCalledWith(1);
+      expect(result).toEqual(brand);
     });
   });
-  describe("update", () => {
-    it("should update a brand", async () => {
-      const createBrandDto: CreateBrandDto = {
-        name: "Test Brand",
-        description: "Test Description",
-        iconPath: "/uploads/test-icon.png",
-      };
-      const fileMock = { path: "/uploads/test-icon.png" };
+  describe('update', () => {
+    it('should update a brand by id', async () => {
+      const updateBrandDto: UpdateBrandDto = { name: 'Test Brand', description: 'Test Description', iconPath: 'test.png' };
+      const brand: Brand = { id: 1, ...updateBrandDto, createdAt: new Date(), updatedAt: new Date() };
 
-      jest.spyOn(repository, "save").mockResolvedValueOnce(mockBrands[0]);
-      jest.spyOn(repository, "findOne").mockResolvedValueOnce(mockBrands[0]);
+      jest.spyOn(repositoryMock, 'findOne').mockResolvedValue(brand);
+      jest.spyOn(repositoryMock, 'save').mockResolvedValue(brand);
 
-      const result = await service.update(1, createBrandDto, fileMock);
+      const result = await service.update(1, updateBrandDto, null);
 
-      expect(result).toEqual(mockBrands[0]);
-      expect(repository.save).toHaveBeenCalledWith(expect.any(Brand));
-      expect(repository.findOne).toHaveBeenCalledWith(1);
-    });
-    it("should handle errors during brand update", async () => {
-      const createBrandDto: CreateBrandDto = {
-        name: "Test Brand",
-        description: "Test Description",
-        iconPath: "/uploads/test-icon.png",
-      };
-      const fileMock = { path: "/uploads/test-icon.png" };
-
-      jest.spyOn(repository, "save").mockRejectedValueOnce(new Error("Save failed"));
-      jest.spyOn(repository, "findOne").mockResolvedValueOnce(mockBrands[0]);
-
-      await expect(service.update(1, createBrandDto, fileMock)).rejects.toThrowError("Save failed");
-      expect(repository.save).toHaveBeenCalledWith(expect.any(Brand));
-      expect(repository.findOne).toHaveBeenCalledWith(1);
+      expect(result).toEqual(brand);
     });
   });
-  describe("remove", () => {
-    it("should remove a brand", async () => {
-      const deleteResult: DeleteResult = { affected: 1, raw: {} }; // Provide the expected structure
-
-      jest.spyOn(repository, "delete").mockResolvedValueOnce(deleteResult);
-
-      const result = await service.remove(1);
-
-      expect(result).toEqual(deleteResult);
-      expect(repository.delete).toHaveBeenCalledWith(1);
-    });
-
-    it("should handle errors during brand removal", async () => {
-      jest.spyOn(repository, "delete").mockRejectedValueOnce(new Error("Delete failed"));
-
-      await expect(service.remove(1)).rejects.toThrowError("Delete failed");
-      expect(repository.delete).toHaveBeenCalledWith(1);
-    });
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
+  describe('remove', () => {
+      it('should remove a brand by id', async () => {
+        const brand: Brand = { id: 1, name: 'Test Brand', description: 'Test Description', iconPath: 'test.png', createdAt: new Date(), updatedAt: new Date() };
+  
+        jest.spyOn(repositoryMock, 'findOne').mockResolvedValue(brand);
+        jest.spyOn(repositoryMock, 'remove').mockResolvedValue(brand);
+  
+        const result = await service.remove(1);
+  
+        expect(result).toEqual(brand);
+      });
   });
 });

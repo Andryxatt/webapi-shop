@@ -7,6 +7,6 @@ export class Gender {
   id: number;
   @Column()
   name: string;
-  @OneToMany(() => Product, product => product.brand)
+  @OneToMany(() => Product, (product) => product.brand)
   products: Product[];
 }

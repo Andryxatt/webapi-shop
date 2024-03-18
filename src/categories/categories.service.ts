@@ -21,11 +21,11 @@ export class CategoriesService {
   }
 
   findOne(id: number): Promise<Category> {
-    return this.categoryRepository.findOneBy({ id: id });
+    return this.categoryRepository.findOne({where: { id: id }});
   }
 
   async update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    const updCategory = await this.categoryRepository.findOneBy({ id: id });
+    const updCategory = await this.categoryRepository.findOne({where: { id: id }});
     updCategory.name = updateCategoryDto.name;
     updCategory.description = updateCategoryDto.description;
     await this.categoryRepository.update(id, updCategory);
@@ -33,7 +33,7 @@ export class CategoriesService {
   }
 
   async remove(id: number) {
-    const category = await this.categoryRepository.findOneBy({ id: id });
+    const category = await this.categoryRepository.findOne({where: { id: id }});
     return this.categoryRepository.remove(category);
   }
 }

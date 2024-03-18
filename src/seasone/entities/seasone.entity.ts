@@ -1,5 +1,12 @@
 import { Product } from "../../products/entities/product.entity";
-import { PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Column, OneToMany, Entity } from "typeorm";
+import {
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Column,
+  OneToMany,
+  Entity,
+} from "typeorm";
 @Entity("Seasones")
 export class Seasone {
   @PrimaryGeneratedColumn()
@@ -10,6 +17,6 @@ export class Seasone {
   updatedAt: Date;
   @Column({ unique: true })
   name: string;
-  @OneToMany(() => Product, product => product.seasone)
+  @OneToMany(() => Product, (product) => product.seasone)
   products: Product[];
 }

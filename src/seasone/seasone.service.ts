@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { CreateSeasoneDto } from './dto/create-seasone.dto';
-import { UpdateSeasoneDto } from './dto/update-seasone.dto';
+import { Injectable } from "@nestjs/common";
+import { CreateSeasoneDto } from "./dto/create-seasone.dto";
+import { UpdateSeasoneDto } from "./dto/update-seasone.dto";
 
 @Injectable()
 export class SeasoneService {
   create(createSeasoneDto: CreateSeasoneDto) {
-    return 'This action adds a new seasone';
+    return "This action adds a new seasone";
   }
 
   findAll() {

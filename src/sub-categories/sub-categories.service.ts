@@ -35,11 +35,16 @@ export class SubCategoriesService {
       where: {
         id,
       },
-      relations: ["category"],
+      relations: {
+        category: true,
+      },
     });
   }
 
-  async update(id: number, updateSubCategoryDto: UpdateSubCategoryDto): Promise<SubCategory> {
+  async update(
+    id: number,
+    updateSubCategoryDto: UpdateSubCategoryDto
+  ): Promise<SubCategory> {
     // await this.subCategoryRepository.update(id, updateSubCategoryDto);
     const updatedSubCategory = await this.subCategoryRepository.findOne({
       where: {

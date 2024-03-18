@@ -95,7 +95,10 @@ describe("DiscountController", () => {
 
       jest.spyOn(discountService, "update").mockResolvedValue(expectedResult);
 
-      const result = await discountController.update(discountId, updateDiscountDto);
+      const result = await discountController.update(
+        discountId,
+        updateDiscountDto
+      );
       expect(result).toBe(expectedResult);
     });
   });

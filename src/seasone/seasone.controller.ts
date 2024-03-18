@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from "@nestjs/common";
 import { CreateSeasoneDto } from "./dto/create-seasone.dto";
 import { UpdateSeasoneDto } from "./dto/update-seasone.dto";
 import { Seasone } from "./entities/seasone.entity";
@@ -9,7 +17,7 @@ import { Repository } from "typeorm";
 export class SeasoneController {
   constructor(
     @InjectRepository(Seasone)
-    private readonly seasoneRepository: Repository<Seasone>,
+    private readonly seasoneRepository: Repository<Seasone>
   ) {}
 
   @Post()

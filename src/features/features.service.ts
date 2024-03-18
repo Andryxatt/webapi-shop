@@ -9,7 +9,7 @@ import { Feature } from "./entities/feature.entity";
 export class FeaturesService {
   constructor(
     @InjectRepository(Feature)
-    private readonly featureRepository: Repository<Feature>,
+    private readonly featureRepository: Repository<Feature>
   ) {}
   create(createFeatureDto: CreateFeatureDto) {
     return this.featureRepository.save(createFeatureDto);
