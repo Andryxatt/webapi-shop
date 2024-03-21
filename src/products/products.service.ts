@@ -158,8 +158,8 @@ export class ProductsService {
       }
     }
     if (
-      jsonFilters.categories.length > 0 &&
-      jsonFilters.subCategories.length === 0
+      jsonFilters.categories?.length > 0 &&
+      jsonFilters.subCategories?.length === 0
     ) {
       const catConditions = {
         subCategories: {

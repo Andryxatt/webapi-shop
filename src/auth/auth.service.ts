@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
 import * as bcrypt from 'bcryptjs'; 
+import { use } from 'passport';
 @Injectable()
 export class AuthService {
   constructor(
@@ -12,8 +13,10 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
   async validateUser(email: string, password: string): Promise<any> {
+    console.log('email', email);
 
     const user = await this.userService.findOne(email);
+    console.log('user', user);
     if (!user) throw new NotFoundException('Email Does not exist');
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) throw new UnauthorizedException('Invalid Password');
@@ -39,14 +42,17 @@ export class AuthService {
     const payload = { email: user.email, sub: user.uuid };
     console.log('payload', this.jwtService.sign(payload));
     return {
+      user: {
+        email: user.email,
+        uuid: user.uuid,
+        roles: user.roles,
+      },
       access_token: this.jwtService.sign(payload),
     };
   }
 
   async register(registerDto: RegisterDto) {
-    // You can implement registration logic here
-    // Make sure to hash the password before saving it to the database
-    return 'Registration logic here';
+    return await this.userService.createUser(registerDto);
   }
   async googleAuth(req) {
     if (!req.user) {

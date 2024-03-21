@@ -72,4 +72,27 @@ describe('BrandsController', () => {
       expect(result).toEqual(brand);
     });
   });
+  describe('update', () => {
+    it('should update a brand by ID', async () => {
+      const updateBrandDto: CreateBrandDto = { name: 'Test Brand', description: 'Test Description', iconPath: 'test.png' };
+      const brand: Brand = { id: 1, ...updateBrandDto, createdAt: new Date(), updatedAt: new Date() };
+
+      jest.spyOn(service, 'update').mockResolvedValue(brand);
+
+      const result = await controller.update(1, updateBrandDto, null);
+
+      expect(result).toEqual(brand);
+    });
+  });
+  describe('remove', () => {
+    it('should remove a brand by ID', async () => {
+      const brand: Brand = { id: 1, name: 'Test Brand', description: 'Test Description', iconPath: 'test.png', createdAt: new Date(), updatedAt: new Date() };
+
+      jest.spyOn(service, 'remove').mockResolvedValue(brand);
+
+      const result = await controller.remove(1);
+
+      expect(result).toEqual(brand);
+    });
+  });
 });

@@ -27,7 +27,9 @@ export class UserService {
     return await this.userRepository.save(record);
   }
   async findOne(email: string): Promise<any> {
-    return await this.userRepository.findOneBy({ email })
+    //add relation for roles 
+    return await this.userRepository.findOne({ where: { email } });
+
   }
   async remove(id: string): Promise<any> {
     return await this.userRepository.delete({ uuid: id });
@@ -44,7 +46,6 @@ export class UserService {
       throw new BadRequestException('Passwords do not match');
     }
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10); // Adjust the saltRounds as needed
 
     const newUser = this.userRepository.create({
