@@ -134,7 +134,9 @@ export class ProductsService {
     return product;
   }
 
-  async findAll(findProductsDto: any): Promise<PaginationProducts> {
+  async findAll(findProductsDto?: any): Promise<PaginationProducts> {
+    if(findProductsDto === undefined){
+
     const jsonFilters = JSON.parse(findProductsDto);
     const whereCondition: Record<string, any>[] = [];
     if (
@@ -224,6 +226,29 @@ export class ProductsService {
       products,
       total: products.length,
     };
+  }
+  else 
+  {
+    const products = await this.productRepository.find({
+      relations: [
+        "brand",
+        "subCategories",
+        "sizes",
+        "images",
+        "discount",
+        "colores",
+        "features",
+        "features.feature",
+      ],
+      order: {
+        createdAt: "DESC",
+      },
+    });
+    return {
+      products,
+      total: products.length,
+    };
+  }
   }
 
   findOne(id: number): Promise<Product> {
