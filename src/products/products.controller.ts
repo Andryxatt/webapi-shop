@@ -27,7 +27,7 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  @UseInterceptors(FilesInterceptor("files", 20, multerOptions))
+  @UseInterceptors(FilesInterceptor("files"))
   create(
     @Body() createProductDto: CreateProductDto,
     @UploadedFiles() files: Array<Express.Multer.File>

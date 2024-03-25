@@ -4,11 +4,10 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
 import * as bcrypt from 'bcryptjs'; 
-import { use } from 'passport';
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject(forwardRef(() => UserService))//<--- here
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
@@ -21,18 +20,6 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) throw new UnauthorizedException('Invalid Password');
     return user;}
-  //compare passwordasync comparePasswords(password: string,hashedPassword: string): Promise<any> {return bcrypt.compare(password, hashedPassword).then((isMatch) => {if (isMatch) return true;return false;}).catch((err) => err);}
-  // async validateUser(email: string, password: string): Promise<any> {
-  //   const user = await this.userService.findOne(email);
-  //   if (user) {
-  //     const isPasswordValid = await bcrypt.compare(password, user.password);
-  //     if (isPasswordValid) {
-  //       const { password, ...result } = user;
-  //       return result;
-  //     }
-  //   }
-  //   return null;
-  // }
 
   async login(loginDto: LoginDto) {
     const user = await this.validateUser(loginDto.email, loginDto.password);
@@ -40,7 +27,6 @@ export class AuthService {
       return null;
     }
     const payload = { email: user.email, sub: user.uuid };
-    console.log('payload', this.jwtService.sign(payload));
     return {
       user: {
         email: user.email,

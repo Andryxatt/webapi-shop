@@ -4,6 +4,8 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { RegisterDto } from '@auth/dto/auth.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { Role } from '@utils/role.enum';
 @Injectable()
 export class UserService {
   constructor(
@@ -40,21 +42,39 @@ export class UserService {
     const newUser = this.userRepository.create(user);
     return newUser;
   }
-  async createUser(createUserDto: RegisterDto): Promise<User> {
+  // async createUser(createUserDto: RegisterDto): Promise<User> {
+  //   const { password, confirmPassword, ...userData } = createUserDto;
+  //   if (password !== confirmPassword) {
+  //     throw new BadRequestException('Passwords do not match');
+  //   }
+
+  //   const hashedPassword = await bcrypt.hash(password, 10); // Adjust the saltRounds as needed
+
+  //   const newUser = this.userRepository.create({
+  //     ...userData,
+  //     password: hashedPassword, // Store the hashed password
+  //   });
+
+  //   return await this.userRepository.save(newUser);
+  // }
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
     const { password, confirmPassword, ...userData } = createUserDto;
     if (password !== confirmPassword) {
-      throw new BadRequestException('Passwords do not match');
+        throw new BadRequestException('Passwords do not match');
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10); // Adjust the saltRounds as needed
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = this.userRepository.create({
-      ...userData,
-      password: hashedPassword, // Store the hashed password
-    });
+    const newUser = this.userRepository.create(
+        {
+            ...userData,
+            password: hashedPassword,
+            roles: [Role.User], // Default role as 'user'
+        }
+    );
 
     return await this.userRepository.save(newUser);
-  }
+}
   async findOneAndUpdate(query: any, payload: any): Promise<User> {
     const record = await this.userRepository.findOne(query);
     if (!record) {

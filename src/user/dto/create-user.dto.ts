@@ -1,3 +1,4 @@
+import { Role } from "@utils/role.enum";
 import { IsEmail, IsNotEmpty, IsString, Matches  } from "class-validator";
 
 export class CreateUserDto {
@@ -16,6 +17,4 @@ export class CreateUserDto {
     @IsNotEmpty()
     @IsString()
     confirmPassword: string;
-   
-    refreshToken: string;
 }

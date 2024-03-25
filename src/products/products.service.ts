@@ -17,7 +17,10 @@ import { Feature } from "@features/entities/feature.entity";
 import { Colore } from "@colore/entities/colore.entity";
 import { Seasone } from "@seasone/entities/seasone.entity";
 import * as fs from "fs";
-
+import sharp from "sharp";
+import { extname } from "path";
+import { writeFile } from 'fs/promises';
+import { v4 as uuid } from "uuid";
 @Injectable()
 export class ProductsService {
   constructor(
@@ -105,9 +108,10 @@ export class ProductsService {
       });
     }
     if (files !== null || files !== undefined) {
-      files.forEach(async (image) => {
+      const optimizedFileNames = await this.optimizeAndSaveImage(files);
+      optimizedFileNames.forEach(async (image) => {
         const productImage = new ProductImage();
-        productImage.imagePath = image.path;
+        productImage.imagePath = image;
         productImage.product = product;
         await this.productImageRepository.save(productImage);
       });
@@ -313,7 +317,7 @@ export class ProductsService {
       relations: ["images"],
     });
     product.images.forEach((image) => {
-      fs.unlink(image.imagePath, (err) => {
+      fs.unlink(`./uploads/files/products/${image.imagePath}`, (err) => {
         if (err) {
           console.error(err);
         }
@@ -339,4 +343,28 @@ export class ProductsService {
     });
     return { products, total: products.length };
   }
+
+
+  async optimizeAndSaveImage(files: Express.Multer.File[]): Promise<string[]> {
+    const optimizedFileNames: string[] = [];
+
+    await Promise.all(
+      files.map(async (file) => {
+        const optimizedImageBuffer = await sharp(file.buffer)
+          .resize({ width: 800 }) // Resize the image to a maximum width of 800px (adjust as needed)
+          .jpeg({ quality: 80 }) // Convert the image to JPEG format with 80% quality (adjust as needed)
+          .toBuffer();
+
+        const optimizedFileName = `${uuid()}${extname(file.originalname)}`;
+        const optimizedFilePath = `./uploads/files/products/${optimizedFileName}`;
+
+        await writeFile(optimizedFilePath, optimizedImageBuffer);
+        optimizedFileNames.push(optimizedFileName);
+      })
+    );
+    return optimizedFileNames;
+  }
+
 }
+
+
