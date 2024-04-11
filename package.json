@@ -59,7 +59,8 @@
     "save-dev": "^0.0.1-security",
     "sharp": "^0.33.2",
     "typeorm": "^0.3.20",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@mikro-orm/cli": "^6.1.7",

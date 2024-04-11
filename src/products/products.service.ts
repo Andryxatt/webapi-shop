@@ -3,7 +3,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { UpdateProductDto } from "./dto/update-product.dto";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Between, In, Like, Repository } from "typeorm";
+import { Brackets, ILike, In, Repository } from "typeorm";
 import { Product } from "./entities/product.entity";
 import { Brand } from "../brands/entities/brand.entity";
 import { SubCategory } from "../sub-categories/entities/sub-category.entity";
@@ -80,16 +80,16 @@ export class ProductsService {
     const product = await this.productRepository.save({
       name: createProductDto.name,
       model: createProductDto.model,
-      brand: brand,
-      description: createProductDto.description,
+      brand: brand || null,
+      description: createProductDto.description || "",
       price: createProductDto.price,
-      discount: discount,
+      discount: discount || null,
       curencyPrice: createProductDto.curencyPrice,
-      subCategories: subCategories,
-      gender: gender,
-      seasone: seasone,
-      status: createProductDto.status,
-      colores: coloresAdded,
+      subCategories: subCategories || null,
+      gender: gender || null,
+      seasone: seasone || null,
+      status: createProductDto.status || "новий",
+      colores: coloresAdded || null,
     });
 
     if (
@@ -111,7 +111,7 @@ export class ProductsService {
       const optimizedFileNames = await this.optimizeAndSaveImage(files);
       optimizedFileNames.forEach(async (image) => {
         const productImage = new ProductImage();
-        productImage.imagePath = image;
+        productImage.imagePath = image.imagePath;
         productImage.product = product;
         await this.productImageRepository.save(productImage);
       });
@@ -135,130 +135,106 @@ export class ProductsService {
   }
 
   async findAll(findProductsDto?: any): Promise<PaginationProducts> {
-    if(findProductsDto === undefined){
 
-    const jsonFilters = JSON.parse(findProductsDto);
-    const whereCondition: Record<string, any>[] = [];
-    if (
-      jsonFilters.minPrice !== undefined &&
-      jsonFilters.maxPrice !== undefined
-    ) {
-      const minPrice = parseInt(jsonFilters.minPrice);
-      const maxPrice = parseInt(jsonFilters.maxPrice);
-      whereCondition.push({ price: Between(minPrice, maxPrice) });
-    }
-    if (jsonFilters.search) {
-      const searchCondition = { name: Like(`%${jsonFilters.search}%`) };
-      if (whereCondition.length > 0) {
-        Object.assign(whereCondition[0], searchCondition);
-      } else {
-        whereCondition.push(searchCondition);
-      }
-    }
-    if (jsonFilters.brands && jsonFilters.brands.length > 0) {
-      const brandCondition = { brand: In(jsonFilters.brands) };
-      if (whereCondition.length > 0) {
-        Object.assign(whereCondition[0], brandCondition);
-      } else {
-        whereCondition.push(brandCondition);
-      }
-    }
-    if (
-      jsonFilters.categories?.length > 0 &&
-      jsonFilters.subCategories?.length === 0
-    ) {
-      const catConditions = {
-        subCategories: {
-          category: In(jsonFilters.categories),
-        },
-      };
-      if (whereCondition.length > 0) {
-        Object.assign(whereCondition[0], catConditions);
-      } else {
-        whereCondition.push(catConditions);
-      }
-    } else if (
-      jsonFilters.subCategories &&
-      jsonFilters.subCategories.length > 0
-    ) {
-      const subConditions = {
-        subCategories: {
-          id: In(jsonFilters.subCategories),
-        },
-      };
-      if (whereCondition.length > 0) {
-        Object.assign(whereCondition[0], subConditions);
-      } else {
-        whereCondition.push(subConditions);
-      }
-    }
-    if (jsonFilters.colores && jsonFilters.colores.length > 0) {
-      const coloresCondition = {
-        colores: {
-          id: In(jsonFilters.colores),
-        },
-      };
-      if (whereCondition.length > 0) {
-        Object.assign(whereCondition[0], coloresCondition);
-      } else {
-        whereCondition.push(coloresCondition);
-      }
-    }
 
-    const products = await this.productRepository.find({
-      relations: [
-        "brand",
-        "subCategories",
-        "sizes",
-        "images",
-        "discount",
-        "colores",
-        "features",
-        "features.feature",
-      ],
-      order: {
-        createdAt: "DESC",
-      },
-      take: jsonFilters.limit,
-      where: whereCondition.length > 0 ? whereCondition : {},
-    });
-    return {
-      products,
-      total: products.length,
-    };
-  }
-  else 
-  {
-    const products = await this.productRepository.find({
-      relations: [
-        "brand",
-        "subCategories",
-        "sizes",
-        "images",
-        "discount",
-        "colores",
-        "features",
-        "features.feature",
-      ],
-      order: {
-        createdAt: "DESC",
-      },
-    });
-    return {
-      products,
-      total: products.length,
-    };
-  }
+    const queryBuilder = this.productRepository.createQueryBuilder('product')
+    if (findProductsDto !== undefined) {
+      const jsonFilters = JSON.parse(findProductsDto);
+      const whereCondition: Record<string, any>[] = [];
+      if (
+        jsonFilters.minPrice !== undefined &&
+        jsonFilters.maxPrice !== undefined
+      ) {
+        const minPrice = parseInt(jsonFilters.minPrice);
+        const maxPrice = parseInt(jsonFilters.maxPrice);
+        queryBuilder.where('product.price BETWEEN :minPrice AND :maxPrice', { minPrice, maxPrice });
+      }
+      if (jsonFilters.search) {
+        const searchConditionName = { name: ILike(`%${jsonFilters.search}%`)};
+        const searchConditionModel = { model: ILike(`%${jsonFilters.search}%`)};
+        queryBuilder.andWhere(new Brackets(qb => {
+          qb.where(searchConditionName).orWhere(searchConditionModel);
+        }));
+      }
+      if (jsonFilters.brands && jsonFilters.brands.length > 0) {
+        const brandCondition = { brand: In(jsonFilters.brands) };
+        queryBuilder.andWhere(brandCondition);
+      }
+      if (
+        jsonFilters.categories?.length > 0 &&
+        jsonFilters.subCategories?.length === 0
+      ) {
+        const catConditions = {
+          subCategories: {
+            category: In(jsonFilters.categories),
+          },
+        };
+        queryBuilder.andWhere(catConditions);
+      } else if (
+        jsonFilters.subCategories &&
+        jsonFilters.subCategories.length > 0
+      ) {
+        const subConditions = {
+          subCategories: {
+            id: In(jsonFilters.subCategories),
+          },
+        };
+        queryBuilder.andWhere(subConditions);
+      }
+      if (jsonFilters.colores && jsonFilters.colores.length > 0) {
+        const coloresCondition = {
+          colores: {
+            id: In(jsonFilters.colores),
+          },
+        };
+        queryBuilder.andWhere(coloresCondition);
+      }
+      queryBuilder.leftJoinAndSelect("product.brand", "brand");
+      queryBuilder.leftJoinAndSelect("product.subCategories", "subCategories");
+      queryBuilder.leftJoinAndSelect("product.sizes", "sizes");
+      queryBuilder.leftJoinAndSelect("product.images", "images");
+      queryBuilder.leftJoinAndSelect("product.discount", "discount");
+      queryBuilder.leftJoinAndSelect("product.colores", "colores");
+      queryBuilder.leftJoinAndSelect("product.features", "features");
+      const products = await queryBuilder.take(jsonFilters.limit).getMany();
+      const total = await this.productRepository.count();
+      return {
+        products,
+        total
+      };
+    }
+    else {
+      const products = await this.productRepository.find({
+        relations: [
+          "brand",
+          "subCategories",
+          "sizes",
+          "images",
+          "discount",
+          "colores",
+          "features",
+          "features.feature",
+        ],
+        order: {
+          createdAt: "DESC",
+        },
+      });
+      return {
+        products,
+        total: products.length,
+      };
+    }
   }
 
-  findOne(id: number): Promise<Product> {
-    const product = this.productRepository.findOne({
+  async findOne(id: string): Promise<Product> {
+    const product = await this.productRepository.findOne({
       relations: ["brand", "subCategories", "sizes", "images"],
       where: { id: id },
     });
     return product;
   }
-  likeProduct(id: number): Promise<Product> {
+
+  async likeProduct(id: string): Promise<Product> {
     const product = this.productRepository.findOne({ where: { id: id } });
     if (!product) {
       throw new NotFoundException("Entity not found");
@@ -271,7 +247,7 @@ export class ProductsService {
   }
 
   async update(
-    id: number,
+    id: string,
     updateProductDto: UpdateProductDto,
     files: Array<Express.Multer.File>
   ) {
@@ -301,12 +277,12 @@ export class ProductsService {
       id: In(array),
     });
     const updatedProduct = await this.productRepository.save(product);
-
-    files?.forEach(async (image) => {
-      const productImage = new ProductImage();
-      productImage.imagePath = image.path;
-      productImage.product = updatedProduct;
-      await this.productImageRepository.save(productImage);
+      const optimizedFileNames = await this.optimizeAndSaveImage(files);
+      optimizedFileNames.forEach(async (image) => {
+        const productImage = new ProductImage();
+        productImage.imagePath = image.imagePath;
+        productImage.product = product;
+        await this.productImageRepository.save(productImage);
     });
     // //TODO update product sizes
     if (
@@ -336,7 +312,7 @@ export class ProductsService {
     return updatedProduct;
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const product = await this.productRepository.findOne({
       where: { id: id },
       relations: ["images"],
@@ -369,9 +345,8 @@ export class ProductsService {
     return { products, total: products.length };
   }
 
-
-  async optimizeAndSaveImage(files: Express.Multer.File[]): Promise<string[]> {
-    const optimizedFileNames: string[] = [];
+  async optimizeAndSaveImage(files: Express.Multer.File[]): Promise<any[]> {
+    const optimizedFileNames: any[] = [];
 
     await Promise.all(
       files.map(async (file) => {
@@ -384,12 +359,62 @@ export class ProductsService {
         const optimizedFilePath = `./uploads/files/products/${optimizedFileName}`;
 
         await writeFile(optimizedFilePath, optimizedImageBuffer);
-        optimizedFileNames.push(optimizedFileName);
+        optimizedFileNames.push({imagePath: optimizedFilePath, originalFileName: file.originalname});
       })
     );
     return optimizedFileNames;
   }
 
+  async createManyFromFile(table: any): Promise<any> {
+    const products = await this.createProductsFromExcel(table)
+    console.log(products)
+  }
+  async uploadPhotosMany(files: Array<Express.Multer.File>) {
+    console.log(files)
+    if (files !== null || files !== undefined) {
+      const optimizedFileNames = await this.optimizeAndSaveImage(files);
+      
+      optimizedFileNames.forEach(async (image) => {
+        const product = await this.productRepository.findOne({  where: { model: image.originalFileName.split('_')[0] } });
+        console.log(product)
+        const productImage = new ProductImage();
+        productImage.imagePath = image.imagePath;
+        productImage.product = product;
+        await this.productImageRepository.save(productImage);
+      });
+    }
+  }
+
+  parseExcelDataToObjects(table: any): any[] {
+    return table.slice(2).map((item: any) => ({
+      name: item.__EMPTY,
+      model: item.__EMPTY_1,
+      code: item.__EMPTY_2,
+      sizeType: item.__EMPTY_3,
+      diapazoneSize: item.__EMPTY_4,
+      sizeAssortment: item.__EMPTY_5,
+      countPairsInBox: item.__EMPTY_6,
+      countBoxes: item.__EMPTY_7
+    }));
+  }
+  async createProductsFromExcel(table: any): Promise<any> {
+    const transformedData = this.parseExcelDataToObjects(table)
+    const products = transformedData.map(async (product: any) => {
+      const productEntity = await this.productRepository.save({
+        name: product.name,
+        model: product.model,
+        code: product.code,
+        sizeType: product.sizeType,
+        diapazoneSize: product.diapazoneSize,
+        sizeAssortment: product.sizeAssortment,
+        countPairsInBox: product.countPairsInBox,
+        countBoxes: product.countBoxes,
+        price: 0,
+      });
+      return productEntity;
+    }, []);
+    return Promise.all(products);
+  }
 }
 
 

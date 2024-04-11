@@ -11,20 +11,17 @@ import {
   UploadedFiles,
   Res,
   Query,
+  UploadedFile,
 } from "@nestjs/common";
 import { ProductsService } from "./products.service";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { UpdateProductDto } from "./dto/update-product.dto";
-import { FilesInterceptor } from "@nestjs/platform-express";
-import { multerOptions } from "src/utils/multer.options";
+import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { Product } from "./entities/product.entity";
-// import * as multerGoogleStorage from "multer-google-storage";
-// import { v4 as uuid } from "uuid";
-// import { extname } from "path";
-// import shop_info_config from "../shop-info-config.json";
+import * as xlsx from 'xlsx';
 @Controller("products")
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(private readonly productsService: ProductsService) { }
 
   @Post()
   @UseInterceptors(FilesInterceptor("files"))
@@ -34,6 +31,27 @@ export class ProductsController {
   ) {
     return this.productsService.create(createProductDto, files);
   }
+  @Post("upload-excel")
+  @UseInterceptors(FileInterceptor("file"))
+  uploadExcel(@UploadedFile() file: Express.Multer.File) {
+    try {
+      const workbook = xlsx.read(file.buffer, { type: 'buffer' });
+      const sheetName = workbook.SheetNames[0]; // Assuming there is only one sheet
+      const sheet = workbook.Sheets[sheetName];
+      const data = xlsx.utils.sheet_to_json(sheet);
+      return this.productsService.createManyFromFile(data);
+    } catch (error) {
+      console.error('Error processing file:', error);
+      return { success: false, message: 'Error processing file' };
+    }
+  }
+  @Post("upload-image")
+  @UseInterceptors(FilesInterceptor("files"))
+  uploadImage(@UploadedFiles() files: Array<Express.Multer.File>) {
+    console.log(files);
+    return this.productsService.uploadPhotosMany(files);
+  }
+
   @Get("uploads/files/products/:fileId")
   async getBrand(@Param("fileId") fileId, @Res() res): Promise<any> {
     res.sendFile(fileId, { root: "uploads/files/products" });
@@ -48,25 +66,25 @@ export class ProductsController {
   }
   @Post("like/:id")
   like(@Param("id") id: string) {
-    return this.productsService.likeProduct(+id);
+    return this.productsService.likeProduct(id);
   }
   @Get(":id")
   async findOne(@Param("id") id: string): Promise<Product> {
-    return await this.productsService.findOne(+id);
+    return await this.productsService.findOne(id);
   }
 
   @Patch(":id")
-  @UseInterceptors(FilesInterceptor("files", 20, multerOptions))
+  @UseInterceptors(FilesInterceptor("files"))
   update(
     @Param("id") id: string,
     @Body() updateProductDto: UpdateProductDto,
     @UploadedFiles() files: Array<Express.Multer.File>
   ) {
-    return this.productsService.update(Number(id), updateProductDto, files);
+    return this.productsService.update(id, updateProductDto, files);
   }
 
   @Delete(":id")
   remove(@Param("id") id: string) {
-    return this.productsService.remove(+id);
+    return this.productsService.remove(id);
   }
 }

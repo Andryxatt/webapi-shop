@@ -32,6 +32,15 @@ export class CreateProductDto {
   genderId?: number;
   @ApiProperty()
   seasoneId?: number;
+
+  @ApiProperty()
+  code?: number;
+
+  @ApiProperty()
+  diapazoneSize?: string;
+  @ApiProperty()
+  sizeAssortment?: string;
+
   @ApiProperty()
   discountId?: number;
   @ApiProperty()
